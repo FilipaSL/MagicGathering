@@ -1,0 +1,22 @@
+.cardList{
+    display:inline-flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card{
+    margin: 4%;
+}
+
+
+.body{
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+
+    font-size: large;
+    font-weight: 500;
+    padding: 2rem;
+}
