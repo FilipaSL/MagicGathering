@@ -1,100 +1,178 @@
-import React, {useState} from 'react';
-import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import React, { useState, useEffect } from 'react';
+import Row from 'react-bootstrap/Row';
+import CardsModal from './Modals/CardsModal'
 import HeaderNav from './HeaderNav';
+import DisplayCard from './DisplayCards/InfoDisplay';
 import "./UserPage.css";
 
 function UserPage(props) {
     let cardList;
+    let lists;
     let collectionList;
+
     const {loggedUser} = props;
 
-    const [viewMode, setViewMode] = useState(3)
+    //User cards and collections
+    const [collections, setCollections] = useState(null);
+    const [cards, setOfficialCards] = useState(null);
+
+    //FilteredCards and collections
+    const [filteredCollections, setFilteredCollections] = useState(null);
+    const [filteredCards, setFilteredOfficialCards] = useState(null);
+
+    //view collection's cards info
+    const [viewCardsModal, setViewCardsModal] = useState(false);
+    const [modalColName, setModalColName] = useState(null);
+    const [modalCards, setModalCards] = useState(null);
+
+    //view Mode
+    const [viewMode, setViewMode] = useState(3);
+
+    useEffect(() => {
+        fetch(`/collections/user/${props.loggedUser.id}`)
+        .then((res) => res.json())
+        .then((col) =>{
+            setCollections(col)
+            setFilteredCollections(col)
+        }
+            )
+        .catch(
+            (error) => { })
+
+        fetch(`/cards/${props.loggedUser.id}`)
+            .then((res) => res.json())
+            .then((cards) =>{
+                setOfficialCards(cards.flat())
+                setFilteredOfficialCards(cards.flat())
+            }
+                    )
+            .catch((error) => { })
+
+    }, [props.loggedUser.id]);
 
     const handleViewMode =(value)=>{
-        console.log(value);
         setViewMode(value);
+    }
+
+    const handleViewCardsModal = (colId)=>{
+        setViewCardsModal(!viewCardsModal);
+
+        if(!viewCardsModal){
+            const nameCollection = collections.find((col)=>{
+                if(col && col.id==colId){
+                    return col.colName
+                }
+            });
+
+            setModalColName(nameCollection.colName);
+
+            const amostra = cards.filter((card)=>card.collectionId == colId);
+    
+            setModalCards(amostra);
+        }
+
+    }
+
+    const handleSearch = (word) =>{
+        //filter Cards
+        const cardsNiche = cards.filter((card)=>card.cardName.toUpperCase().includes(word.toUpperCase()))
+        setFilteredOfficialCards(cardsNiche)
+        //filterCollections
+        const colNiche = collections.filter((col)=>col.colName.toUpperCase().includes(word.toUpperCase()))
+        setFilteredCollections(colNiche)
+    }
+
+    const handleResetSearch =()=>{
+        setFilteredOfficialCards(cards);
+        setFilteredCollections(collections);
     }
 
     const headerProps = {
         handleViewMode,
+        handleSearch,
         loggedUser
     }
 
-    if(props.cards){
-        cardList = props.cards.map((card, index)=>{
+    const cardsModalProps = {
+        viewCardsModal,
+        handleViewCardsModal,
+        viewCards: modalCards,
+        colName: modalColName
+    }
+    
+    let getCardCol = (cardId)=>{
+        if(collections){
+            let cardName = collections.find((col)=>col.id == cardId)
+
+            return cardName ? cardName.colName : "None";
+        }
+        return "None";
+    }
+
+    //Fill in variable with list of cards to display
+    if(filteredCards){
+        cardList = filteredCards.map((card, index)=>{
+            let displayProps= {
+                isCard: true,
+                card, 
+                index, 
+                getCardCol
+            }
             return(
-              <Card className = "card" key= {index} bg= 'Info' text = 'dark' style={{ width: '18rem' }}>
-                 <Card.Header as="h5">
-                    <Card.Title>{card.cardName}</Card.Title>
-                    <ButtonGroup aria-label="First group">
-                        <Button variant="">Edit</Button>
-                        <Button variant="secondary">Delete</Button>
-                    </ButtonGroup>
-                </Card.Header>
-                 <Card.Body>
-                     <Card.Text>
-                     {card.description}
-                     </Card.Text>
-                 </Card.Body>
-             </Card>
+                <DisplayCard key ={index} {...displayProps}></DisplayCard>
              )
          })
     }
 
-    if(props.collections){
-        collectionList = props.collections.map((collection, index)=>{
-            return(
-              <Card className = "card"  key= {index} bg= 'Info' text = 'dark' style={{ width: '18rem' }}>
-                <Card.Header as="h5">
-                <ButtonGroup aria-label="First group">
-                        <Button variant="">Edit</Button>
-                        <Button variant="secondary">Delete</Button>
-                    </ButtonGroup>
 
-                </Card.Header>
-                 <Card.Img vaiant="top" src="../logo.svg" />
-                 <Card.Body>
-                     <Card.Title>{collection.colName}</Card.Title>
-                 </Card.Body>
-             </Card>
-             )
+    //Fill in variable with list of collections to display
+    if(filteredCollections){
+        collectionList = filteredCollections.map((collection, index)=>{
+            if(collection){
+                let displayProps= {
+                    collection, 
+                    index, 
+                    handleViewCardsModal
+                }
+                return(
+                   <DisplayCard key ={index} {...displayProps}></DisplayCard>
+                 )
+            }
          })
     }
 
-    let lists;
+    //Conditional Rendering according with view mode
+
     switch(viewMode){
         case 1:
-            lists = <> <p>Your Cards</p>
+            lists = <div> <p>Your Cards</p>
 
-            <div className='cardList'> {cardList}</div></>
+            <Row xs={2} md={3} className="justify-content-center"> {cardList}</Row></div>
             break;
         case 2:
-            lists = <> <p>Your Collections</p>
-            <div className='cardList'> {collectionList}</div></>
+            lists = <div> <p>Your Collections</p>
+            <Row xs={2} md={3} className="justify-content-center"> {collectionList}</Row></div>
             break;
         case 3:
         default:
-            lists = <> <p>Your Cards</p>
+            lists = <div> 
+                <p>Your Cards</p>
+                <Row xs={2} md={3} className="justify-content-center"> {cardList}</Row>
 
-            <div className='cardList'> {cardList}</div>
-
-            <p>Your Collections</p>
-            <div className='cardList'> {collectionList}</div>
-            </>
+                <p>Your Collections</p>
+                <Row xs={2} md={3} className="justify-content-center"> {collectionList}</Row>
+            </div>
     }
     
     return (
         <div className='userPage'>
             <div className='header'>
-                <HeaderNav {...headerProps}></HeaderNav>
+                <HeaderNav {...headerProps} style={{ width: '100%' }}></HeaderNav>
             </div>
             <div className='body'>
                 {lists}
-
             </div>
-           
+           {viewCardsModal ? <CardsModal {...cardsModalProps}></CardsModal>: <></>}
 
         </div>
     );

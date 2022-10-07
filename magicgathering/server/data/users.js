@@ -6,7 +6,6 @@ module.exports =
 		"realName" : "Ana",
 		"password" : "123",
 		"admin" : 1,
-		"myCollections" : null
 	},
 	{
 		"id" : 2,
@@ -14,7 +13,6 @@ module.exports =
 		"realName" : "Rui",
 		"password" : "456",
 		"admin" : 0,
-		"myCollections" : null
 	},
 	{
 		"id" : 3,
@@ -22,6 +20,5 @@ module.exports =
 		"realName" : "Mário",
 		"password" : "323",
 		"admin" : 0,
-		"myCollections" : null
 	}
 ]

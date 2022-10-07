@@ -1,0 +1,13 @@
+
+.card{
+    margin: 1.5rem;
+}
+
+.subtitle{
+    color: rgba(77, 77, 168, 0.716);
+    align-self: flex-end;
+}
+.subtitle2{
+    color: rgba(168, 119, 77, 0.716);
+    align-self: flex-end;
+}

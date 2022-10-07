@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import LoginModal from './components/LoginModal'
+import LoginModal from './components/Modals/LoginModal'
 import { Button } from 'react-bootstrap'
 import UserPage from './components/UserPage';
 
@@ -10,6 +10,8 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [loggedUser, setLoggedUser] = useState(null);
+  const [usr, setUsr] = useState(null);
+  const [pass, setPass] = useState(null);
 
   const [users, setUsers] = useState(null);
   const [cards, setCards] = useState(null);
@@ -17,7 +19,19 @@ function App() {
 
 
   useEffect(() => {
-    fetch("/api/users")
+    fetch(`/user/${pass}/${usr}`)
+      .then((res) => res.json())
+      .then((user) =>{
+        setShowLogin(false);
+        setLoggedUser(user)}
+        )
+      .catch(
+          (error) => {
+            setLoginError(true);
+          })
+  }, [pass, usr]);
+
+   /* fetch("/api/users")
       .then((res) => res.json())
       .then((users) => setUsers(users));
 
@@ -28,22 +42,14 @@ function App() {
     fetch("/api/collections")
       .then((res) => res.json())
       .then((collections) => setCollections(collections));
-  }, []);
+*/
 
   const handleCloseLogin = () => setShowLogin(false);
   const handleShowLogin = () => setShowLogin(true);
-  const handleLogin = (username, password) => {
-    const data = users.find(user => {
-     return  user.userName === username && user.password === password
-    });
 
-    if(data){
-      setShowLogin(false);
-      setLoggedUser(data);
-    }
-    else{
-      setLoginError(true);
-    }
+  const handleLogin = (username, password) => {
+    setUsr(username);
+    setPass(password);
   }
 
 
@@ -56,8 +62,6 @@ function App() {
   }
 
   const userProps = {
-    cards,
-    collections,
     loggedUser
   }
 
@@ -73,7 +77,7 @@ function App() {
   return (
     <div className="App">
       <p className= "appHeader">Magic Gathering Guide</p>
-       { loggedUser? AppBody : Login }
+       { loggedUser ? AppBody : Login }
     </div>
   );
 }

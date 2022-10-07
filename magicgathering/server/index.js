@@ -20,13 +20,225 @@ app.get("/api/users", (req, res) => {
     res.json(users);
   });
 
+app.get('/user/:pass/:usr', (req, res) => {
+  
+    const pass = req.params.pass;
+    const username = req.params.usr;
+
+  
+    const data = users.find(user => {
+      return  user.userName === username && user.password === pass
+     });
+
+    if(data!= undefined){
+      res.json(data);
+      return;
+    }
+  
+    res.status(404).send('User not found');
+});
+  
+
+
+//Cards Requests
 app.get("/api/cards", (req, res) => {
     res.json(cards);
 });
 
+/*
+
+app.get('/card/:id', (req, res) => {
+  
+  const id = req.params.id;
+
+  const card = cards.find((elem)=> {return elem.id == id})
+
+  if(card!= undefined){
+    res.json(card);
+    return;
+  }
+     
+
+  res.status(404).send('Card not found');
+});
+*/
+
+//All unofficial collections cards belonging to a user
+app.get('/cards/unnoficial/:id', (req, res)  => {
+  const id = req.params.id;
+
+  //its always only one element
+  let collection = collections.filter((elem)=> {return elem.userId == id && elem.official == 0})
+
+  if(collection){
+    let unnoficialCards = cards.filter((elem)=>{return elem.collectionId == collection.id})
+
+    if(unnoficialCards){
+      res.json(unnoficialCards);
+      return;
+    }
+  }
+
+  res.status(404).send('User does not have cards without a collection');
+
+});
+
+//All cards belonging to a user
+app.get('/cards/:id', (req, res)  => {
+  const id = req.params.id;
+
+  //it can be more than one element
+  let userCollection = collections.filter((elem)=> {return elem.userId == id})
+
+  //it can be an official or not and it will create empty results
+  if(userCollection){
+    let userCards = userCollection.map((userCol)  => 
+      cards.filter((elem)=>{return elem.collectionId == userCol.id}))
+
+    if(userCards){
+      //clean empty results
+      let desiredCards = userCards.filter((entry)=>entry.length>0)
+
+      res.json(desiredCards);
+      return;
+    }
+  }
+
+  res.status(404).send('User does not have cards');
+
+});
+
+
+app.delete('/card/:id', (req, res) => {
+  // reading id from the URL
+  const id = req.params.id;
+
+  // remove item from the cards array
+  cards = cards.filter(i => {
+      if (i.id != id) {
+          return true;
+      }
+
+      return false;
+  });
+
+  res.send('card is deleted');
+});
+
+app.post('/card/:id', (req, res) => {
+  // reading id from the URL
+  const id = req.params.id;
+  const newcard = req.body;
+
+  // remove item from the cards array
+  for (let i = 0; i < cards.length; i++) {
+      let card = cards[i]
+
+      if (card.id == id) {
+          cards[i] = newcard;
+      }
+  }
+
+  res.send('card is edited');
+});
+
+
+//Collections Requests
 app.get("/api/collections", (req, res) => {
     res.json(collections);
 });
+
+app.get('/collection/:id', (req, res)  => {
+  const id = req.params.id;
+
+  let collection = collections.find((elem)=> {return elem.id == id})
+
+  if(collection){
+    res.json(collection);
+    return;
+  }
+});
+
+//All official collections belonging to a user
+app.get('/collections/user/:id', (req, res)  => {
+  const id = req.params.id;
+
+  let collection = collections.filter((elem)=> {return elem.userId == id && elem.official == 1})
+
+  if(collection){
+    res.json(collection);
+    return;
+  }
+
+  res.status(404).send('User does not have collections');
+
+});
+
+//All unOfficial collections belonging to a user
+app.get('/unCollections/user/:id', (req, res)  => {
+  const id = req.params.id;
+
+  let collection = collections.filter((elem)=> {return elem.userId == id && elem.official == 0})
+
+  if(collection){
+    res.json(collection[0].id);
+    return;
+  }
+
+  res.status(404).send('User does not have cards without collection');
+
+});
+
+//get all cards from a collection
+app.get('/collection/cards/:id', (req, res) => {
+  
+  const id = req.params.id;
+
+  const card = cards.filter((elem)=> {return elem.collectionId == id})
+
+  if(card!= undefined){
+    res.json(card);
+    return;
+  }
+     
+
+  res.status(404).send('This collection has no cards');
+});
+
+
+app.delete('/collection/:id', (req, res) => {
+  // reading id from the URL
+  const id = req.params.id;
+
+  // remove item from the collections array
+  collections = collections.filter(i => {
+      if (i.id !== id) {
+          return true;
+      }
+
+      return false;
+  });
+
+  res.send('collection is deleted');
+});
+
+app.post('/collection/:id', (req, res) => {
+  // reading id from the URL
+  const id = req.params.id;
+  const newcollection = req.body;
+
+  // remove item from the collections array
+  for (let i = 0; i < collections.length; i++) {
+      let collection = collections[i]
+
+      if (collection.id === id) {
+          collections[i] = newcollection;
+      }
+  }
+
+  res.send('collection is edited');
+});
+
   
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
