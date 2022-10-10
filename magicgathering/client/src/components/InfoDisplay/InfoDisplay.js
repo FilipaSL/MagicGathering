@@ -7,7 +7,7 @@ import "./InfoDisplay.css";
 
 function InfoDisplay(props){
                     
-    const {isCard, collection, card, index} = props;
+    const {isCard, collection, card, index, handleCardDelete, handleColDelete, handleViewEditCardModal} = props;
 
     if(isCard && card){
         return (
@@ -24,8 +24,8 @@ function InfoDisplay(props){
                 </Card.Body>
                 <Card.Footer>
                     <ButtonGroup aria-label="First group">
-                        <Button  size = "sm" variant="secondary">Edit</Button>
-                        <Button  size = "sm" variant="secondary">Delete</Button>
+                        <Button  size = "sm" variant="secondary" onClick = {()=>handleViewEditCardModal(card.id)}>Edit</Button>
+                        <Button  size = "sm" variant="secondary" onClick = {()=>handleCardDelete(card.id)}>Delete</Button>
                     </ButtonGroup>
                 </Card.Footer>
             </Card>
@@ -43,9 +43,9 @@ function InfoDisplay(props){
                  </Card.Body>
                  <Card.Footer>
                     <ButtonGroup aria-label="First group" >
-                            <Button size = "sm" variant="light">Edit</Button>
+                            <Button size = "sm" variant="secondary">Edit</Button>
                             <Button size = "sm" variant="outline-info" onClick={()=>props.handleViewCardsModal(collection.id)}>View Cards</Button>
-                            <Button size = "sm" variant="outline-secondary">Delete</Button>
+                            <Button size = "sm" variant="secondary" onClick={()=>handleColDelete(collection.id)}>Delete</Button>
                         </ButtonGroup>
                  </Card.Footer>
              </Card>

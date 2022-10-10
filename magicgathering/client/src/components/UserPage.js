@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Row from 'react-bootstrap/Row';
 import CardsModal from './Modals/CardsModal'
+import EditCardModal from './Modals/EditCardModal'
 import HeaderNav from './HeaderNav';
-import DisplayCard from './DisplayCards/InfoDisplay';
+import InfoDisplay from './InfoDisplay/InfoDisplay';
 import "./UserPage.css";
 
 function UserPage(props) {
@@ -15,6 +16,8 @@ function UserPage(props) {
     //User cards and collections
     const [collections, setCollections] = useState(null);
     const [cards, setOfficialCards] = useState(null);
+    const [unOfficialCol, setUnOfficialCol] = useState(null);
+
 
     //FilteredCards and collections
     const [filteredCollections, setFilteredCollections] = useState(null);
@@ -25,9 +28,21 @@ function UserPage(props) {
     const [modalColName, setModalColName] = useState(null);
     const [modalCards, setModalCards] = useState(null);
 
+    //delete operations status
+    const [deletingCardID, setDeletingCard] = useState(null);
+    const [deletingColID, setDeletingCol] = useState(null);
+
+    //Edit Cards Modal
+    const [viewEditCardModal, setViewEditCardModal] = useState(false);
+    const [cardEditModal, setCardToEditModal] = useState(null)
+    const [saveEditedCard, setSaveEditedCard] = useState(null)
+
+
     //view Mode
     const [viewMode, setViewMode] = useState(3);
 
+
+    //GET Operations
     useEffect(() => {
         fetch(`/collections/user/${props.loggedUser.id}`)
         .then((res) => res.json())
@@ -39,6 +54,15 @@ function UserPage(props) {
         .catch(
             (error) => { })
 
+        fetch(`/unCollections/user/${props.loggedUser.id}`)
+            .then((res) => res.json())
+            .then((colID) =>{
+                setUnOfficialCol(colID)
+            }
+                )
+            .catch(
+                (error) => { })
+
         fetch(`/cards/${props.loggedUser.id}`)
             .then((res) => res.json())
             .then((cards) =>{
@@ -49,6 +73,56 @@ function UserPage(props) {
             .catch((error) => { })
 
     }, [props.loggedUser.id]);
+
+    //Delete Operations
+    useEffect(()=>{
+        if(deletingCardID!==null){
+            fetch(`/card/${deletingCardID}`, {method: 'delete'})
+            .then(()=>{
+                const cardsNiche = cards.filter((card)=>card.id!==deletingCardID);
+                setOfficialCards(cardsNiche);
+                setFilteredOfficialCards(cardsNiche);
+                setDeletingCard(null); 
+            })
+            .catch((error) => {             
+                console.log("Error Deleting Card")
+                })
+        }
+       
+    }, [deletingCardID]);
+
+    useEffect(()=>{
+        if(deletingColID!== null && unOfficialCol !== null){
+            fetch(`/collection/${deletingColID}/${unOfficialCol}/`, {method: 'delete'})
+            .then(() =>{
+                const colsNiche = collections.filter((col)=>col.id!==deletingColID);
+                setCollections(colsNiche);
+                setFilteredCollections(colsNiche);
+                setDeletingCol(null);
+            }
+                    )
+            .catch((error) => { })
+        }
+      
+    }, [deletingColID])
+
+    //Post methods 
+    useEffect(()=>{
+        if(saveEditedCard !== null){
+            fetch(`/card/${cardEditModal.id}`, 
+            {method: 'post',
+            body: saveEditedCard})
+            .then((res) => res.json())
+            .then((cards)=>{
+                console.log(cards)
+            })
+            .catch((error) => {  console.log("Error Editig Card")})
+        }
+        
+    }, [saveEditedCard]);
+
+
+    //Handle Functions
 
     const handleViewMode =(value)=>{
         setViewMode(value);
@@ -62,6 +136,7 @@ function UserPage(props) {
                 if(col && col.id==colId){
                     return col.colName
                 }
+                return ""
             });
 
             setModalColName(nameCollection.colName);
@@ -87,6 +162,48 @@ function UserPage(props) {
         setFilteredCollections(collections);
     }
 
+    const handleCardDelete = (id)=>{
+        setDeletingCard(id);
+    }
+
+    const handleColDelete = (id)=>{
+        console.log("Collection to delete:::"+ id);
+        setDeletingCol(id);
+    }
+
+    const handleViewEditCardModal = (id) =>{
+        setViewEditCardModal(!viewEditCardModal)
+        if(!viewEditCardModal){
+            const desiredCard = cards.find((card)=> card.id == id);
+            if(desiredCard){
+                setCardToEditModal(desiredCard);
+    
+            }
+        }
+    }
+
+    const handleSaveEditCardModal = (name, valor, description) =>{
+       /* const newCard = `{
+            id:${cardEditModal.id},
+            cardName:${name.value},
+            value:${valor.value},
+            description:${description.value},
+        }`;*/
+
+        const newCard = JSON.stringify(
+            {
+                id: cardEditModal.id,
+                cardName: name.value,
+                value: valor.value,
+                description: description.value
+            }
+        )
+        setSaveEditedCard(newCard);   
+    }
+
+
+
+    //Props definitions
     const headerProps = {
         handleViewMode,
         handleSearch,
@@ -97,7 +214,16 @@ function UserPage(props) {
         viewCardsModal,
         handleViewCardsModal,
         viewCards: modalCards,
-        colName: modalColName
+        colName: modalColName,
+        handleViewEditCardModal,
+        handleCardDelete
+    }
+
+    const editCardsModalProps = {
+        show: viewEditCardModal,
+        handleClose: handleViewEditCardModal,
+        card: cardEditModal,
+        handleSave: handleSaveEditCardModal
     }
     
     let getCardCol = (cardId)=>{
@@ -116,10 +242,12 @@ function UserPage(props) {
                 isCard: true,
                 card, 
                 index, 
-                getCardCol
+                getCardCol,
+                handleCardDelete,
+                handleViewEditCardModal
             }
             return(
-                <DisplayCard key ={index} {...displayProps}></DisplayCard>
+                <InfoDisplay key ={index} {...displayProps}></InfoDisplay>
              )
          })
     }
@@ -132,10 +260,11 @@ function UserPage(props) {
                 let displayProps= {
                     collection, 
                     index, 
-                    handleViewCardsModal
+                    handleViewCardsModal,
+                    handleColDelete
                 }
                 return(
-                   <DisplayCard key ={index} {...displayProps}></DisplayCard>
+                   <InfoDisplay key ={index} {...displayProps}></InfoDisplay>
                  )
             }
          })
@@ -173,6 +302,8 @@ function UserPage(props) {
                 {lists}
             </div>
            {viewCardsModal ? <CardsModal {...cardsModalProps}></CardsModal>: <></>}
+           {viewEditCardModal ? <EditCardModal {...editCardsModalProps}></EditCardModal>: <></>}
+
 
         </div>
     );

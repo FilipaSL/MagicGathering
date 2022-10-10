@@ -8,18 +8,14 @@ import UserPage from './components/UserPage';
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
-  const [loginError, setLoginError] = useState(false);
+  const [loginError, setLoginError] = useState(null);
   const [loggedUser, setLoggedUser] = useState(null);
   const [usr, setUsr] = useState(null);
   const [pass, setPass] = useState(null);
 
-  const [users, setUsers] = useState(null);
-  const [cards, setCards] = useState(null);
-  const [collections, setCollections] = useState(null);
-
-
   useEffect(() => {
-    fetch(`/user/${pass}/${usr}`)
+    if(usr!== null && pass !== null){
+      fetch(`/user/${pass}/${usr}`)
       .then((res) => res.json())
       .then((user) =>{
         setShowLogin(false);
@@ -27,8 +23,11 @@ function App() {
         )
       .catch(
           (error) => {
-            setLoginError(true);
+            console.log(error);
+            setLoginError(error);
           })
+    }
+    
   }, [pass, usr]);
 
    /* fetch("/api/users")

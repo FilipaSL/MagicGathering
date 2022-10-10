@@ -7,6 +7,7 @@ function AdaptativeModal(props) {
     let footer;
     const {
         handleClose,
+        handleSave,
         show,
         modalTitle
     } = props;
@@ -17,7 +18,7 @@ function AdaptativeModal(props) {
             <Button variant="secondary" onClick={handleClose}>
                 Close
             </Button>
-            <Button variant="primary" onClick={handleClose}>
+            <Button variant="primary" onClick={handleSave}>
                 Save Changes
             </Button>
         </Modal.Footer>

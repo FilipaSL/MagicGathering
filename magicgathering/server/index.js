@@ -2,9 +2,10 @@
 
 const express = require("express");
 const cors = require("cors");
-const users = require("./data/users");
-const cards = require("./data/cards");
-const collections = require("./data/collections");
+let users = require("./data/users");
+let cards = require("./data/cards");
+let collections = require("./data/collections");
+var bodyParser = require('body-parser');
 const config = require("./config");
 
 const {port, allowedDomains} = config;
@@ -14,6 +15,8 @@ const PORT = port || 3001;
 const app = express();
 
 app.use(cors({origin: allowedDomains}))
+app.use(bodyParser.text({type: 'json'}));
+
 
 //Pedidos API
 app.get("/api/users", (req, res) => {
@@ -45,24 +48,6 @@ app.get("/api/cards", (req, res) => {
     res.json(cards);
 });
 
-/*
-
-app.get('/card/:id', (req, res) => {
-  
-  const id = req.params.id;
-
-  const card = cards.find((elem)=> {return elem.id == id})
-
-  if(card!= undefined){
-    res.json(card);
-    return;
-  }
-     
-
-  res.status(404).send('Card not found');
-});
-*/
-
 //All unofficial collections cards belonging to a user
 app.get('/cards/unnoficial/:id', (req, res)  => {
   const id = req.params.id;
@@ -92,8 +77,15 @@ app.get('/cards/:id', (req, res)  => {
 
   //it can be an official or not and it will create empty results
   if(userCollection){
-    let userCards = userCollection.map((userCol)  => 
-      cards.filter((elem)=>{return elem.collectionId == userCol.id}))
+    let userCards = userCollection.map( (userCol)  => {
+      if(cards){
+       return cards.filter((elem)=>{
+          return elem.collectionId == userCol.id
+        })
+      }
+      
+    })
+     
 
     if(userCards){
       //clean empty results
@@ -128,18 +120,25 @@ app.delete('/card/:id', (req, res) => {
 app.post('/card/:id', (req, res) => {
   // reading id from the URL
   const id = req.params.id;
-  const newcard = req.body;
+  const newCard = req.body;
 
-  // remove item from the cards array
-  for (let i = 0; i < cards.length; i++) {
-      let card = cards[i]
+  let oldCard  = cards.find((card)=>{return card.id==id} )
 
-      if (card.id == id) {
-          cards[i] = newcard;
-      }
+  console.log(oldCard);
+
+  console.log(JSON.parse(newCard))
+  
+  if(newCard && oldCard){
+      oldCard.cardName= newCard.cardName;
+      oldCard.value= newCard.value;
+      oldCard.description= newCard.description; 
+    res.json(cards);
+    return ;
+
   }
+  res.status(500).send('Error editing card');
 
-  res.send('card is edited');
+
 });
 
 
@@ -174,7 +173,7 @@ app.get('/collections/user/:id', (req, res)  => {
 
 });
 
-//All unOfficial collections belonging to a user
+//ID of the unOfficial collections belonging to a user
 app.get('/unCollections/user/:id', (req, res)  => {
   const id = req.params.id;
 
@@ -206,18 +205,24 @@ app.get('/collection/cards/:id', (req, res) => {
 });
 
 
-app.delete('/collection/:id', (req, res) => {
+app.delete('/collection/:id/:unnoficialBackupId', (req, res) => {
   // reading id from the URL
   const id = req.params.id;
+  const unnoficialBackupId = req.params.id;
 
   // remove item from the collections array
   collections = collections.filter(i => {
-      if (i.id !== id) {
+      if (i.id !== id) {  
           return true;
       }
-
       return false;
   });
+
+  cards = cards.map( (card)=>{
+      if(card && card.collectionId == id){
+          card.collectionId == unnoficialBackupId;
+      }
+  })
 
   res.send('collection is deleted');
 });

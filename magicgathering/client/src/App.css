@@ -5,8 +5,10 @@
   justify-content: space-evenly;
   text-align: center;
   background-color: #282c34;
+  background-size: cover;
   color: antiquewhite;
   height: 100%;
+  width: 100%;
 }
 
 .appHeader {

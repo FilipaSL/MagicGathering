@@ -1,14 +1,14 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import AdaptativeModal from './AdaptativeModal.js';
-import InfoDisplay from '../DisplayCards/InfoDisplay.js';
+import InfoDisplay from '../InfoDisplay/InfoDisplay.js';
 import Row from 'react-bootstrap/Row';
 
 
 function CardsModal(props) {
   
-    const {viewCards, viewCardsModal, handleViewCardsModal, colName} = props;
+    const {viewCards, viewCardsModal, handleViewCardsModal, colName, handleCardDelete, handleViewEditCardModal} = props;
     const modalTitle= "Collection "+ colName + " Cards";
     const footer = false;
 
@@ -21,6 +21,7 @@ function CardsModal(props) {
 
     const displayCardProps = {
       isCard: true,
+      handleCardDelete,
       colName
     }
 
@@ -28,7 +29,8 @@ function CardsModal(props) {
       let cardProps = {
         ...displayCardProps,
         card,
-        index
+        index,
+        handleViewEditCardModal
       }
       return <InfoDisplay key = {index} {...cardProps} />
 

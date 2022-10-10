@@ -15,12 +15,10 @@ function HeaderNav(props){
         props.handleViewMode(value);
     }
   
-    
     const handleSearch=()=> {
         props.handleSearch(searchWord.current.value)
     }
 
-   
     const handleLogout=()=> {    }
 
     return (
@@ -60,7 +58,7 @@ function HeaderNav(props){
                             <Navbar.Text>
                                 Signed in as: <a href="#login">{props.loggedUser.realName}</a>
                             </Navbar.Text>
-                            <Nav.Link href="#action2" onClick={()=>handleLogout()}>Logout</Nav.Link>
+                            <Nav.Link href="#action" onClick={()=>handleLogout()}>Logout</Nav.Link>
 
                         </Navbar.Collapse>
                     </Container>

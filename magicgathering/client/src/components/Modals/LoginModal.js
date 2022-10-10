@@ -6,13 +6,6 @@ import AdaptativeModal from './AdaptativeModal.js';
 
 
 function LoginModal(props) {
-    /*
-    Para o caso de querermos footer:
-      const closeButtonText = "Close";
-      const loginButtonText = "Login";
-      const footer = true;
-    */
-
     
    const email = useRef(null);
    const pass = useRef(null);
