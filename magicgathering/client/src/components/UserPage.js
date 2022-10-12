@@ -44,7 +44,7 @@ function UserPage(props) {
 
     //GET Operations
     useEffect(() => {
-        fetch(`/collections/user/${props.loggedUser.id}`)
+        fetch(`/api/collections/user/${loggedUser._id}`)
         .then((res) => res.json())
         .then((col) =>{
             setCollections(col)
@@ -52,32 +52,32 @@ function UserPage(props) {
         }
             )
         .catch(
-            (error) => { })
+            (error) => { console.log(error) })
 
-        fetch(`/unCollections/user/${props.loggedUser.id}`)
+        fetch(`/api/unCollections/user/${loggedUser._id}`)
             .then((res) => res.json())
             .then((colID) =>{
-                setUnOfficialCol(colID)
+                setUnOfficialCol(colID._id)
             }
                 )
             .catch(
-                (error) => { })
+                (error) => { console.log(error) })
 
-        fetch(`/cards/${props.loggedUser.id}`)
+        fetch(`/api/cards/${loggedUser._id}`)
             .then((res) => res.json())
             .then((cards) =>{
                 setOfficialCards(cards.flat())
                 setFilteredOfficialCards(cards.flat())
             }
                     )
-            .catch((error) => { })
+            .catch((error) => { console.log(error) })
 
-    }, [props.loggedUser.id]);
+    }, [loggedUser._id]);
 
     //Delete Operations
     useEffect(()=>{
         if(deletingCardID!==null){
-            fetch(`/card/${deletingCardID}`, {method: 'delete'})
+            fetch(`/api/card/${deletingCardID}`, {method: 'delete'})
             .then(()=>{
                 const cardsNiche = cards.filter((card)=>card.id!==deletingCardID);
                 setOfficialCards(cardsNiche);
@@ -93,7 +93,7 @@ function UserPage(props) {
 
     useEffect(()=>{
         if(deletingColID!== null && unOfficialCol !== null){
-            fetch(`/collection/${deletingColID}/${unOfficialCol}/`, {method: 'delete'})
+            fetch(`/api/collection/${deletingColID}/${unOfficialCol}/`, {method: 'delete'})
             .then(() =>{
                 const colsNiche = collections.filter((col)=>col.id!==deletingColID);
                 setCollections(colsNiche);
@@ -109,14 +109,15 @@ function UserPage(props) {
     //Post methods 
     useEffect(()=>{
         if(saveEditedCard !== null){
-            fetch(`/card/${cardEditModal.id}`, 
+            fetch(`/api/card/${cardEditModal._id}`, 
             {method: 'post',
-            body: saveEditedCard})
+            body: saveEditedCard,
+            "Content-Type": "application/json"})
             .then((res) => res.json())
             .then((cards)=>{
                 console.log(cards)
             })
-            .catch((error) => {  console.log("Error Editig Card")})
+            .catch((error) => {  console.log("Error Editig Card: "+ error)})
         }
         
     }, [saveEditedCard]);
@@ -174,7 +175,7 @@ function UserPage(props) {
     const handleViewEditCardModal = (id) =>{
         setViewEditCardModal(!viewEditCardModal)
         if(!viewEditCardModal){
-            const desiredCard = cards.find((card)=> card.id == id);
+            const desiredCard = cards.find((card)=> card._id == id);
             if(desiredCard){
                 setCardToEditModal(desiredCard);
     
@@ -192,7 +193,7 @@ function UserPage(props) {
 
         const newCard = JSON.stringify(
             {
-                id: cardEditModal.id,
+                _id: cardEditModal._id,
                 cardName: name.value,
                 value: valor.value,
                 description: description.value

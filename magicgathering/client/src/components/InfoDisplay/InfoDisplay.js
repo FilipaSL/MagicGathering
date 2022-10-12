@@ -24,8 +24,8 @@ function InfoDisplay(props){
                 </Card.Body>
                 <Card.Footer>
                     <ButtonGroup aria-label="First group">
-                        <Button  size = "sm" variant="secondary" onClick = {()=>handleViewEditCardModal(card.id)}>Edit</Button>
-                        <Button  size = "sm" variant="secondary" onClick = {()=>handleCardDelete(card.id)}>Delete</Button>
+                        <Button  size = "sm" variant="secondary" onClick = {()=>handleViewEditCardModal(card._id)}>Edit</Button>
+                        <Button  size = "sm" variant="secondary" onClick = {()=>handleCardDelete(card._id)}>Delete</Button>
                     </ButtonGroup>
                 </Card.Footer>
             </Card>

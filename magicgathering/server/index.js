@@ -2,21 +2,56 @@
 
 const express = require("express");
 const cors = require("cors");
-let users = require("./data/users");
-let cards = require("./data/cards");
-let collections = require("./data/collections");
+// Import DB Connection
+//require("./config/db_connect.js");
+let users = require("./api/models/users");
+let cards = require("./api/models/cards");
+let collections = require("./api/models/collections");
 var bodyParser = require('body-parser');
 const config = require("./config");
+const mongoose = require("mongoose")
+
+
+// Import API route
+var routes = require('./api/routes'); //importing route
 
 const {port, allowedDomains} = config;
 
 const PORT = port || 3001;
 
-const app = express();
+var  uri = 'mongodb+srv://root:root@magic.99bcfwb.mongodb.net/magicgathering';
 
-app.use(cors({origin: allowedDomains}))
-app.use(bodyParser.text({type: 'json'}));
+// Declare a variable named option and assign optional settings
+const  options = {
+    useNewUrlParser:  true,
+    useUnifiedTopology:  true
+    };
 
+
+// Connect MongoDB Atlas using mongoose connect method
+mongoose.connect(uri, options)
+  .then(() => {
+      console.log("Database connection established!");
+      const app = express();
+
+      app.use(cors({origin: allowedDomains}))
+      app.use(bodyParser.text({type: 'json'}));
+
+      
+      app.use("/api", routes) // new
+
+      app.listen(PORT, () => {
+        console.log(`Server listening on ${PORT}`);
+      });
+   // routes(app);
+
+
+  },
+  err  => {{
+      console.log("Error connecting Database instance due to:", err);
+  }});
+
+/*
 
 //Pedidos API
 app.get("/api/users", (req, res) => {
@@ -245,6 +280,4 @@ app.post('/collection/:id', (req, res) => {
 });
 
   
-app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
-});
+*/

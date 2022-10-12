@@ -13,9 +13,15 @@ function App() {
   const [usr, setUsr] = useState(null);
   const [pass, setPass] = useState(null);
 
+  /*useEffect(()=>{
+    fetch(`/api/cards`).then((res)=> res.json()).then((cards)=> console.log(cards)).catch((error)=> console.log(error))    
+  })*/
+
+
+  
   useEffect(() => {
     if(usr!== null && pass !== null){
-      fetch(`/user/${pass}/${usr}`)
+      fetch(`api/user/${pass}/${usr}`)
       .then((res) => res.json())
       .then((user) =>{
         setShowLogin(false);
@@ -29,19 +35,6 @@ function App() {
     }
     
   }, [pass, usr]);
-
-   /* fetch("/api/users")
-      .then((res) => res.json())
-      .then((users) => setUsers(users));
-
-    fetch("/api/cards")
-      .then((res) => res.json())
-      .then((cards) => setCards(cards));
-    
-    fetch("/api/collections")
-      .then((res) => res.json())
-      .then((collections) => setCollections(collections));
-*/
 
   const handleCloseLogin = () => setShowLogin(false);
   const handleShowLogin = () => setShowLogin(true);
