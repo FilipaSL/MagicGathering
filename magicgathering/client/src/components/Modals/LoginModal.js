@@ -1,59 +1,57 @@
-import React, {useRef} from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useRef } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-import { Button, Form } from 'react-bootstrap'
-import AdaptativeModal from './AdaptativeModal.js';
-
+import { Button, Form } from "react-bootstrap";
+import AdaptativeModal from "./AdaptativeModal.js";
 
 function LoginModal(props) {
-    
-   const email = useRef(null);
-   const pass = useRef(null);
+  const email = useRef(null);
+  const pass = useRef(null);
 
-  
-    const modalTitle= "Login";
-    const footer = false;
-    
-    const handleLoginSubmit = () =>{
-        props.handleLogin(email.current.value, pass.current.value)
-    }
+  const modalTitle = "Login";
+  const footer = false;
 
-    const modalProps = {
-      modalTitle,
-      footer
-    } 
+  const handleLoginSubmit = () => {
+    props.handleLogin(email.current.value, pass.current.value);
+  };
 
-    return (
-        
-        <AdaptativeModal {...props} {...modalProps}>
-            <Form>
-            <Form.Group className="mb-3" controlId="username">
-                <Form.Label>Username</Form.Label>
-                <Form.Control type="email" placeholder="Enter username" ref={email} />
-                <Form.Text className="text-muted">
-                Login through real name is not supported as it may not be unique. 
-                </Form.Text>
-            </Form.Group>
+  const modalProps = {
+    modalTitle,
+    footer,
+  };
 
-            <Form.Group className="mb-3" controlId="password">
-                <Form.Label>Password</Form.Label>
-                <Form.Control type="password" placeholder="Password" ref = {pass}/>
-            </Form.Group>
+  return (
+    <AdaptativeModal {...props} {...modalProps}>
+      <Form>
+        <Form.Group className="mb-3" controlId="username">
+          <Form.Label>Username</Form.Label>
+          <Form.Control placeholder="Enter username" ref={email} />
+          <Form.Text className="text-muted">
+            Login through real name is not supported as it may not be unique.
+          </Form.Text>
+        </Form.Group>
 
-            {props.loginError ? 
-            <Form.Group className="mb-3" controlId="errorMessage">
-                <Form.Text className="text-muted">
-                    Invalid Username or Password. Try again.
-                </Form.Text>
-            </Form.Group>: <></>}
-            
-            <Button variant="primary" type="submit" onClick={handleLoginSubmit}>
-                Login
-            </Button>
-            </Form>
+        <Form.Group className="mb-3" controlId="password">
+          <Form.Label>Password</Form.Label>
+          <Form.Control type="password" placeholder="Password" ref={pass} />
+        </Form.Group>
 
-        </AdaptativeModal>
-    );
+        {props.loginError ? (
+          <Form.Group className="mb-3" controlId="errorMessage">
+            <Form.Text className="text-muted">
+              Invalid Username or Password. Try again.
+            </Form.Text>
+          </Form.Group>
+        ) : (
+          <></>
+        )}
+
+        <Button variant="primary" type="submit" onClick={handleLoginSubmit}>
+          Login
+        </Button>
+      </Form>
+    </AdaptativeModal>
+  );
 }
 
 export default LoginModal;

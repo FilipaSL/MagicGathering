@@ -2,54 +2,48 @@
 
 const express = require("express");
 const cors = require("cors");
-// Import DB Connection
-//require("./config/db_connect.js");
-let users = require("./api/models/users");
-let cards = require("./api/models/cards");
-let collections = require("./api/models/collections");
-var bodyParser = require('body-parser');
-const config = require("./config");
-const mongoose = require("mongoose")
 
+var bodyParser = require("body-parser");
+const config = require("./config");
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
+const mongoose = require("mongoose");
 
 // Import API route
-var routes = require('./api/routes'); //importing route
+//var routes = require("./api/routes"); //importing route
+const userRoutes = require("./api/controllers/user.controller");
 
-const {port, allowedDomains} = config;
+const { allowedDomains } = config;
 
-const PORT = port || 3001;
+const PORT = process.env.PORT || 5000;
 
-var  uri = 'mongodb+srv://root:root@magic.99bcfwb.mongodb.net/magicgathering';
+var uri = process.env.REACT_APP_ATLAS_CONNECTION;
 
 // Declare a variable named option and assign optional settings
-const  options = {
-    useNewUrlParser:  true,
-    useUnifiedTopology:  true
-    };
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+};
+const app = express();
 
+app.use(cors({ origin: allowedDomains }));
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Connect MongoDB Atlas using mongoose connect method
-mongoose.connect(uri, options)
-  .then(() => {
-      console.log("Database connection established!");
-      const app = express();
+mongoose.connect(uri, options);
 
-      app.use(cors({origin: allowedDomains}))
-      app.use(bodyParser.text({type: 'json'}));
+const connection = mongoose.connection;
+connection.once("open", () => {
+  console.log("DB connected.");
+});
 
-      
-      app.use("/api", routes) // new
+app.use("/users", userRoutes);
 
-      app.listen(PORT, () => {
-        console.log(`Server listening on ${PORT}`);
-      });
-   // routes(app);
-
-
-  },
-  err  => {{
-      console.log("Error connecting Database instance due to:", err);
-  }});
+app.listen(PORT, () => {
+  console.log(`Server listening on ${PORT}`);
+});
 
 /*
 

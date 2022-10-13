@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-import LoginModal from './components/Modals/LoginModal'
-import { Button } from 'react-bootstrap'
-import UserPage from './components/UserPage';
+import LoginModal from "./components/Modals/LoginModal";
+import { Button } from "react-bootstrap";
+import UserPage from "./components/UserPage";
+import { sendRequest } from "./endpoints";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -13,63 +14,65 @@ function App() {
   const [usr, setUsr] = useState(null);
   const [pass, setPass] = useState(null);
 
-  /*useEffect(()=>{
-    fetch(`/api/cards`).then((res)=> res.json()).then((cards)=> console.log(cards)).catch((error)=> console.log(error))    
-  })*/
-
-
-  
   useEffect(() => {
-    if(usr!== null && pass !== null){
-      fetch(`api/user/${pass}/${usr}`)
-      .then((res) => res.json())
-      .then((user) =>{
-        setShowLogin(false);
-        setLoggedUser(user)}
-        )
-      .catch(
-          (error) => {
-            console.log(error);
-            setLoginError(error);
-          })
-    }
-    
-  }, [pass, usr]);
+    const user = sendRequest("/users").then((res) => console.log(res));
+    setShowLogin(false);
+    console.log(user);
+    setLoggedUser(user);
 
+    console.log(user);
+  });
+  /*
+  useEffect(() => {
+    if (usr !== null && pass !== null) {
+      const user = sendRequest(`/api/user/${pass}/${usr}`, "GET");
+      setShowLogin(false);
+      console.log(user);
+      setLoggedUser(user);
+    }
+  }, [pass, usr]);
+*/
   const handleCloseLogin = () => setShowLogin(false);
   const handleShowLogin = () => setShowLogin(true);
 
   const handleLogin = (username, password) => {
-    setUsr(username);
-    setPass(password);
-  }
-
+    const user = sendRequest("/users");
+    user.then((res) => console.log(res));
+    /* const user = sendRequest(`/api/user/${pass}/${usr}`, "GET");
+    setShowLogin(false);
+    console.log(user);
+    setLoggedUser(user);
+    // setUsr(username);
+    // setPass(password);*/
+  };
 
   const loginFormProps = {
     show: showLogin,
     handleClose: handleCloseLogin,
     handleShow: handleShowLogin,
     handleLogin,
-    loginError
-  }
+    loginError,
+  };
 
   const userProps = {
-    loggedUser
-  }
+    loggedUser,
+  };
 
-  const Login = <div>
-     <Button variant="primary" onClick={handleShowLogin}>
-               Login
-        </Button>
-      <LoginModal {...loginFormProps}/>
-  </div>
+  const Login = (
+    <div>
+      <Button variant="primary" onClick={handleShowLogin}>
+        Login
+      </Button>
+      <LoginModal {...loginFormProps} />
+    </div>
+  );
 
-  const AppBody = <UserPage {...userProps}></UserPage>
-  
+  const AppBody = <UserPage {...userProps}></UserPage>;
+
   return (
     <div className="App">
-      <p className= "appHeader">Magic Gathering Guide</p>
-       { loggedUser ? AppBody : Login }
+      <p className="appHeader">Magic Gathering Guide</p>
+      {loggedUser ? AppBody : Login}
     </div>
   );
 }
