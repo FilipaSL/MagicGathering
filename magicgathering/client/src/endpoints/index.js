@@ -1,7 +1,5 @@
-const mongoURL = process.env.MONGO_SERVER;
-
 module.exports = {
-  sendRequest: async (url, method, body) => {
+  login: async (url, method, body) => {
     return await fetch(url, {
       method: method,
       body: body,
@@ -10,9 +8,26 @@ module.exports = {
       },
     })
       .then((res) => res.json())
-      .then((col) => {
-        console.log(col);
-        return col;
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        return error;
+      });
+  },
+  sendRequest: async (url, method, body) => {
+    const userLog = localStorage.getItem("userInfo");
+    return await fetch(url, {
+      method: method,
+      body: body,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userLog.token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        return data;
       })
       .catch((error) => {
         return error;

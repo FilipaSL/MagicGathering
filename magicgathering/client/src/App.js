@@ -5,45 +5,29 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import LoginModal from "./components/Modals/LoginModal";
 import { Button } from "react-bootstrap";
 import UserPage from "./components/UserPage";
-import { sendRequest } from "./endpoints";
+import userRequests from "./endpoints/users.endpoint";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [loginError, setLoginError] = useState(null);
   const [loggedUser, setLoggedUser] = useState(null);
-  const [usr, setUsr] = useState(null);
-  const [pass, setPass] = useState(null);
+  const [usr, setUsr] = useState("teste2");
+  const [pass, setPass] = useState("asd");
 
-  useEffect(() => {
-    const user = sendRequest("/users").then((res) => console.log(res));
-    setShowLogin(false);
-    console.log(user);
-    setLoggedUser(user);
-
-    console.log(user);
-  });
-  /*
-  useEffect(() => {
-    if (usr !== null && pass !== null) {
-      const user = sendRequest(`/api/user/${pass}/${usr}`, "GET");
-      setShowLogin(false);
-      console.log(user);
-      setLoggedUser(user);
-    }
-  }, [pass, usr]);
+  /*useEffect(() => {
+    if (usr && pass)
+      userRequests
+        .loginUser(JSON.stringify({ userName: usr, password: pass }))
+        .then((res) => console.log(res));
+  }, [usr, pass]);
 */
   const handleCloseLogin = () => setShowLogin(false);
   const handleShowLogin = () => setShowLogin(true);
 
   const handleLogin = (username, password) => {
-    const user = sendRequest("/users");
-    user.then((res) => console.log(res));
-    /* const user = sendRequest(`/api/user/${pass}/${usr}`, "GET");
-    setShowLogin(false);
-    console.log(user);
-    setLoggedUser(user);
-    // setUsr(username);
-    // setPass(password);*/
+    userRequests
+      .loginUser(JSON.stringify({ userName: username, password: password }))
+      .then((res) => setLoggedUser(res));
   };
 
   const loginFormProps = {
