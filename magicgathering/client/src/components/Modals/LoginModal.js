@@ -11,7 +11,8 @@ function LoginModal(props) {
   const modalTitle = "Login";
   const footer = false;
 
-  const handleLoginSubmit = () => {
+  const handleLoginSubmit = (event) => {
+    event.preventDefault();
     props.handleLogin(email.current.value, pass.current.value);
   };
 

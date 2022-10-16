@@ -16,7 +16,7 @@ module.exports = {
       });
   },
   sendRequest: async (url, method, body) => {
-    const userLog = localStorage.getItem("userInfo");
+    const userLog = JSON.parse(localStorage.getItem("userInfo"));
     return await fetch(url, {
       method: method,
       body: body,

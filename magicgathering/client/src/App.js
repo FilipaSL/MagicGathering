@@ -11,23 +11,26 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [loginError, setLoginError] = useState(null);
   const [loggedUser, setLoggedUser] = useState(null);
-  const [usr, setUsr] = useState("teste2");
-  const [pass, setPass] = useState("asd");
+  const [loginInfo, setLoginInfo] = useState(null);
 
-  /*useEffect(() => {
-    if (usr && pass)
-      userRequests
-        .loginUser(JSON.stringify({ userName: usr, password: pass }))
-        .then((res) => console.log(res));
-  }, [usr, pass]);
-*/
   const handleCloseLogin = () => setShowLogin(false);
   const handleShowLogin = () => setShowLogin(true);
 
+  useEffect(() => {
+    if (loginInfo) {
+      userRequests
+        .loginUser(
+          JSON.stringify({ userName: loginInfo.username, password: loginInfo.password })
+        )
+        .then((res) => {
+          setLoggedUser(res);
+        });
+    }
+  }, [loginInfo]);
+
   const handleLogin = (username, password) => {
-    userRequests
-      .loginUser(JSON.stringify({ userName: username, password: password }))
-      .then((res) => setLoggedUser(res));
+    setLoginInfo({ username: username, password: password });
+
   };
 
   const loginFormProps = {

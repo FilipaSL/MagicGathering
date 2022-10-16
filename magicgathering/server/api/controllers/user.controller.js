@@ -1,4 +1,5 @@
 const User = require("../models/user.model");
+const { ObjectId } = require('mongodb');
 const generateToken = require("../utils/generateToken.js");
 
 //Get all users
@@ -20,7 +21,7 @@ const postUser = (req, res) => {
 //Delete one User
 const deleteUser = async (req, res) => {
   const id = req.params.id;
-  const searchId = new ObjectID(id);
+  const searchId = new ObjectId(id);
   await User.deleteOne({ _id: searchId })
     .then(() => res.status(300).json("Success deleting"))
     .catch((err) => res.status(400).json("Error! " + err));
@@ -30,7 +31,7 @@ const deleteUser = async (req, res) => {
 const updateUser = async (req, res) => {
   const id = req.params.id;
   const body = req.body;
-  const searchId = new ObjectID(id);
+  const searchId = new ObjectId(id);
   await User.findByIdAndUpdate(searchId, body)
     .then(() => res.status(300).json("Success updating"))
     .catch((err) => res.status(400).json("Error! " + err));

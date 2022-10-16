@@ -1,7 +1,5 @@
-const Card = require("../models/card.model");
 const Collection = require("../models/collection.model");
-
-const router = require("express").Router();
+const { ObjectId } = require('mongodb');
 
 //Get all collections
 const getAllCollections = async (req, res) => {
@@ -13,7 +11,7 @@ const getAllCollections = async (req, res) => {
 //Get one unnoficial collection
 const getUnCollection = async (req, res) => {
   const id = req.params.id;
-  const searchId = new ObjectID(id);
+  const searchId = new ObjectId(id);
 
   await Collection.findOne({ userId: searchId, official: 0 })
     .then((col) => res.json(col))
@@ -23,7 +21,7 @@ const getUnCollection = async (req, res) => {
 //All user collections
 const getAllUserCollections = async (req, res) => {
   const id = req.params.id;
-  const searchId = new ObjectID(id);
+  const searchId = new ObjectId(id);
 
   await Collection.find({ userId: searchId })
     .then((col) => res.json(col))
@@ -42,7 +40,7 @@ const postCollection = (req, res) => {
 //delete one collection
 const deleteCollection = async (req, res) => {
   const id = req.params.id;
-  const searchId = new ObjectID(id);
+  const searchId = new ObjectId(id);
   await Collection.deleteOne({ _id: searchId })
     .then(() => res.status(300).json("Success deleting"))
     .catch((err) => res.status(400).json("Error! " + err));
@@ -52,7 +50,7 @@ const deleteCollection = async (req, res) => {
 const updateCollection = async (req, res) => {
   const id = req.params.id;
   const body = req.body;
-  const searchId = new ObjectID(id);
+  const searchId = new ObjectId(id);
   await Collection.findByIdAndUpdate(searchId, body)
     .then(() => res.status(300).json("Success updating"))
     .catch((err) => res.status(400).json("Error! " + err));

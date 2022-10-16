@@ -1,10 +1,11 @@
 import { sendRequest, login } from "./index";
 
 const userRequests = {
-  loginUser: (body) => {
-    const user = login("/users/login", "POST", body).then((res) => {
+  loginUser: async (body) => {
+    const user = await login("/users/login", "POST", body)
+    .then((res) => {
       localStorage.setItem("userInfo", JSON.stringify(res));
-      console.log(res);
+      return res;
     });
     return user;
   },

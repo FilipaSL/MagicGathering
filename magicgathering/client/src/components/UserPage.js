@@ -7,6 +7,10 @@ import EditUserModal from "./Modals/formModals/UserFormModal";
 import UserOpsModal from "./Modals/UsersModal";
 import HeaderNav from "./HeaderNav";
 import InfoDisplay from "./InfoDisplay/InfoDisplay";
+import cardRequests from "../endpoints/cards.endpoint";
+import userRequests from "../endpoints/users.endpoint";
+import collectionRequests from "../endpoints/collections.endpoint";
+
 import "./UserPage.css";
 
 function UserPage({ loggedUser }) {
@@ -50,48 +54,31 @@ function UserPage({ loggedUser }) {
   const [viewMode, setViewMode] = useState(3);
 
   //GET Operations
-  useEffect(() => {
-    fetch(`/api/collections/user/${loggedUser._id}`)
-      .then((res) => res.json())
-      .then((col) => {
-        setCollections(col);
-        setFilteredCollections(col);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+   useEffect(() => {
+    collectionRequests.getAllCollectionsFromUser(loggedUser._id)
+    .then((col) => {
+      setCollections(col);
+      setFilteredCollections(col);
+      const unnColl = col.find((elem)=>elem.official === 1);
+      setUnOfficialCol(unnColl._id);
 
-    fetch(`/api/unCollections/user/${loggedUser._id}`)
-      .then((res) => res.json())
-      .then((colID) => {
-        setUnOfficialCol(colID._id);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    fetch(`/api/cards/${loggedUser._id}`)
-      .then((res) => res.json())
+      cardRequests.getUserCards(col)
       .then((cards) => {
-        setOfficialCards(cards.flat());
-        setFilteredOfficialCards(cards.flat());
+        console.log(cards);
+        setOfficialCards(cards);
+        setFilteredOfficialCards(cards);
       })
-      .catch((error) => {
-        console.log(error);
-      });
+    })
+      
     if (loggedUser.admin) {
-      fetch(`/api/users`)
-        .then((res) => res.json())
-        .then((users) => {
-          const allUsers = users.filter((user) => user._id !== loggedUser._id);
-          setUsers(allUsers);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      userRequests.getAllUsers()
+      .then((users) => {
+        const allUsers = users.filter((user) => user._id !== loggedUser._id);
+        setUsers(allUsers);
+      })
     }
   }, [loggedUser._id]);
-
+/*
   //Delete Operations
   useEffect(() => {
     if (deletingCardID !== null) {
@@ -132,7 +119,7 @@ function UserPage({ loggedUser }) {
     if (saveEditedCard !== null) {
     }
   }, [saveEditedCard]);
-
+*/
   //Handle Functions
 
   const handleViewMode = (value) => {

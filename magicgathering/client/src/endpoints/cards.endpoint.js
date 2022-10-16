@@ -1,38 +1,35 @@
 import { sendRequest } from "./index";
 
 const cardsRequest = {
-  getUserCards: async (id) => {
+  getUserCards: async (userCollections) => {
     //it can be more than one element
-    const userCollection = await sendRequest(`/collections/all/${id}`);
+    try {
+      //  const userCollection = await sendRequest(`/collections/all/${id}`);
+      let allCards = [];
+      //it can be an official or not and it will create empty results
 
-    let allCards = await sendRequest("/cards");
+      await userCollections.forEach(async (collection) => {
+        let respCards = await sendRequest(
+          `/cards/collection/${collection._id}`
+        ).then( (ans)=>     {   console.log(ans); allCards.push(ans); return ans;}
+        )
+        console.log(respCards);
 
-    //it can be an official or not and it will create empty results
-    if (userCollection) {
-      let userCards = userCollection.map((userCol) => {
-        if (allCards) {
-          return allCards.filter((elem) => {
-            return elem.collectionId == userCol.id;
-          });
-        }
       });
+      console.log(allCards);
 
-      if (userCards) {
-        //clean empty results
-        let desiredCards = userCards.filter((entry) => entry.length > 0);
-        return desiredCards;
-      }
+      return allCards;
+    } catch (error) {
+      console.log(error);
     }
-
-    res.status(404).send("User does not have cards");
   },
 
   deleteCard: async (id) => {
     try {
       const ans = await sendRequest(`/cards/delete/${id}`);
-      console.log(ans);
-    } catch {
-      (error) => console.log(error);
+      return ans;
+    } catch (error) {
+      console.log(error);
     }
   },
 };
