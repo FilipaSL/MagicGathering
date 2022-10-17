@@ -15,6 +15,26 @@ const userRequests = {
     });
     return users;
   },
+  deleteUser : (id) =>{
+    const status = sendRequest(`/users/delete/${id}`).then((data)=> {return data;})
+    return status;
+  },
+  updateUser: (id, body) => {
+    try {
+      const ans = sendRequest(`/users/update/${id}`, "PUT", body);
+      return ans;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  createUser: (body) => {
+    try {
+      const ans = sendRequest(`users/new`, "POST", body);
+      return ans;
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };
 
 export default userRequests;

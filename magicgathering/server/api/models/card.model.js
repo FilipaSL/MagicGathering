@@ -7,7 +7,7 @@ const Schema = mongoose.Schema;
 // Create Schema Instance and add schema propertise
 const CardSchema = new Schema({
   value: {
-    type: String,
+    type: Intl,
     required: true,
   },
   cardName: {
@@ -19,7 +19,7 @@ const CardSchema = new Schema({
     required: true,
   },
   collectionId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
 });

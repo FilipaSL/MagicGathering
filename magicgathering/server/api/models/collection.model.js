@@ -15,7 +15,7 @@ const CollectionSchema = new Schema({
     required: true,
   },
   userId: {
-    type: Intl,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
 });

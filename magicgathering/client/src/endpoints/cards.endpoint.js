@@ -4,21 +4,16 @@ const cardsRequest = {
   getUserCards: async (userCollections) => {
     //it can be more than one element
     try {
-      //  const userCollection = await sendRequest(`/collections/all/${id}`);
-      let allCards = [];
       //it can be an official or not and it will create empty results
-
-      await userCollections.forEach(async (collection) => {
-        let respCards = await sendRequest(
-          `/cards/collection/${collection._id}`
-        ).then( (ans)=>     {   console.log(ans); allCards.push(ans); return ans;}
+      return Promise.all(
+        userCollections.map((collection) =>
+          sendRequest(`/cards/collection/${collection._id}`).then((ans) => {
+            return ans;
+          })
         )
-        console.log(respCards);
-
+      ).then((data) => {
+        return data.flat();
       });
-      console.log(allCards);
-
-      return allCards;
     } catch (error) {
       console.log(error);
     }
@@ -26,7 +21,23 @@ const cardsRequest = {
 
   deleteCard: async (id) => {
     try {
-      const ans = await sendRequest(`/cards/delete/${id}`);
+      const ans = await sendRequest(`/cards/delete/${id}`, "DELETE");
+      return ans;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  updateCard: (id, body) => {
+    try {
+      const ans = sendRequest(`/cards/update/${id}`, "PUT", body);
+      return ans;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  createCard: (body) => {
+    try {
+      const ans = sendRequest(`cards/new`, "POST", body);
       return ans;
     } catch (error) {
       console.log(error);

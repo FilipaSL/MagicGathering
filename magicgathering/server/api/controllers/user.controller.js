@@ -59,7 +59,7 @@ const loginUser = async (req, res) => {
 };
 
 const registerUser = async (req, res) => {
-  const { userName, password, realName, admin } = req.body;
+  const { userName, password, realName } = req.body;
 
   const userExists = await User.findOne({ userName });
 
@@ -68,7 +68,6 @@ const registerUser = async (req, res) => {
   }
 
   const user = await User.create({
-    admin,
     userName,
     password,
     realName,
@@ -78,7 +77,7 @@ const registerUser = async (req, res) => {
     res.status(201).json({
       _id: user._id,
       userName: user.userName,
-      admin: user.admin,
+      admin: 0,
       realName: user.realName,
       token: generateToken.generateToken(user._id),
     });

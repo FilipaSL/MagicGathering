@@ -15,6 +15,8 @@ function CardsModal({
 }) {
   const modalTitle = "Collection " + colName + " Cards";
   const footer = false;
+  let cardsList = [];
+
 
   const modalProps = {
     modalTitle,
@@ -30,14 +32,16 @@ function CardsModal({
     colName,
   };
 
-  const cardsList = viewCards.map((card, index) => {
-    let cardProps = {
-      ...displayCardProps,
-      card,
-      index,
-    };
-    return <InfoDisplay key={index} {...cardProps} />;
-  });
+  if (viewCardsModal) {
+    cardsList = viewCards.map((card, index) => {
+      let cardProps = {
+        ...displayCardProps,
+        card,
+        index,
+      };
+      return <InfoDisplay key={index} {...cardProps} />;
+    });
+  }
 
   return (
     <AdaptativeModal {...modalProps}>

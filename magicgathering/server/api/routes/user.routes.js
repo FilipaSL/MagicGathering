@@ -8,6 +8,6 @@ router.route("/login").post(userRoutes.loginUser);
 router.route("/new").post(authM.protect, userRoutes.postUser);
 router.route("/delete/:id").delete(authM.protect, userRoutes.deleteUser);
 router.route("/update/:id").put(authM.protect, userRoutes.updateUser);
-router.route("/register").post(authM.protect, userRoutes.registerUser);
+router.route("/register").post(userRoutes.registerUser);
 
 module.exports = router;
