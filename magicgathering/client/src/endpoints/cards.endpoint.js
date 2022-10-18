@@ -29,7 +29,11 @@ const cardsRequest = {
   },
   updateCard: (id, body) => {
     try {
-      const ans = sendRequest(`/cards/update/${id}`, "PUT", body);
+      const ans = sendRequest(`/cards/update/${id}`, "PUT", body).then(
+        (data) => {
+          return data;
+        }
+      );
       return ans;
     } catch (error) {
       console.log(error);
@@ -37,7 +41,11 @@ const cardsRequest = {
   },
   createCard: (body) => {
     try {
-      const ans = sendRequest(`cards/new`, "POST", body);
+      const ans = sendRequest(`cards/new`, "POST", body).then((data) => {
+        console.log("Create data:::");
+        console.log(data);
+        return data;
+      });
       return ans;
     } catch (error) {
       console.log(error);

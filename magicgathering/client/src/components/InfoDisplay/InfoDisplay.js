@@ -113,7 +113,7 @@ function InfoDisplay({
         text="dark"
         style={{ width: "18rem" }}
       >
-        <Card.Header as="h8">
+        <Card.Header as="h5">
           Fellow User is {user.admin ? "Admin" : "NOT Admin"}
         </Card.Header>
         <Card.Body>

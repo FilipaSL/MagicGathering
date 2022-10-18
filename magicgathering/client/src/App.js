@@ -20,17 +20,25 @@ function App() {
     if (loginInfo) {
       userRequests
         .loginUser(
-          JSON.stringify({ userName: loginInfo.username, password: loginInfo.password })
+          JSON.stringify({
+            userName: loginInfo.username,
+            password: loginInfo.password,
+          })
         )
         .then((res) => {
           setLoggedUser(res);
         });
+    } else {
+      setLoggedUser(null);
     }
   }, [loginInfo]);
 
   const handleLogin = (username, password) => {
     setLoginInfo({ username: username, password: password });
+  };
 
+  const handleUserLogout = () => {
+    setLoginInfo(null);
   };
 
   const loginFormProps = {
@@ -43,6 +51,7 @@ function App() {
 
   const userProps = {
     loggedUser,
+    handleUserLogout,
   };
 
   const Login = (

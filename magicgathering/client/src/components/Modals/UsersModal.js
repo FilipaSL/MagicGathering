@@ -12,6 +12,14 @@ function UserOpsModal({
   handleUserEdit,
   handleViewUsersModal,
 }) {
+  if (!viewUsersModal) {
+    return (
+      <AdaptativeModal
+        props={(handleUserDelete, handleUserEdit, viewUsersModal)}
+      ></AdaptativeModal>
+    );
+  }
+
   const modalTitle = "All Users";
   const footer = false;
 

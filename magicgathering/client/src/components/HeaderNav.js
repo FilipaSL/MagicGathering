@@ -14,6 +14,7 @@ function HeaderNav({
   handleViewEditCollectionModal,
   handleViewEditUserModal,
   handleViewUsersModal,
+  handleUserLogout,
   loggedUser,
 }) {
   const searchWord = useRef(null);
@@ -26,7 +27,9 @@ function HeaderNav({
     handleSearch(searchWord.current.value);
   };
 
-  const handleLogout = () => {};
+  const handleLogout = () => {
+    handleUserLogout();
+  };
 
   return (
     <Navbar bg="light" variant="light">

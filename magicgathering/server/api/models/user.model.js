@@ -9,7 +9,7 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
   admin: {
     type: Intl,
-    required: true,
+    required: false,
   },
   userName: {
     type: String,
@@ -22,6 +22,7 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true,
+    select: false,
   },
 });
 

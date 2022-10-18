@@ -13,7 +13,7 @@ import collectionRequests from "../endpoints/collections.endpoint";
 
 import "./UserPage.css";
 
-function UserPage({ loggedUser }) {
+function UserPage({ loggedUser, handleUserLogout }) {
   let cardList;
   let lists;
   let collectionList;
@@ -32,14 +32,9 @@ function UserPage({ loggedUser }) {
   const [modalColName, setModalColName] = useState(null);
   const [modalCards, setModalCards] = useState(null);
 
-  //delete operations status
-  const [deletingCardID, setDeletingCard] = useState(null);
-  const [deletingColID, setDeletingCol] = useState(null);
-
   //Edit Cards Modal
   const [viewEditCardModal, setViewEditCardModal] = useState(false);
   const [cardEditModal, setCardToEditModal] = useState(null);
-  const [saveEditedCard, setSaveEditedCard] = useState(null);
 
   //Edit Collections Modal
   const [viewEditCollectionModal, setViewEditCollectionModal] = useState(false);
@@ -54,72 +49,28 @@ function UserPage({ loggedUser }) {
   const [viewMode, setViewMode] = useState(3);
 
   //GET Operations
-   useEffect(() => {
-    collectionRequests.getAllCollectionsFromUser(loggedUser._id)
-    .then((col) => {
-      setCollections(col);
-      setFilteredCollections(col);
-      const unnColl = col.find((elem)=>elem.official === 1);
+  useEffect(() => {
+    collectionRequests.getAllCollectionsFromUser(loggedUser._id).then((col) => {
+      const showCollections = col.filter((elem) => elem.official === 1);
+      setCollections(showCollections);
+      setFilteredCollections(showCollections);
+      const unnColl = col.find((elem) => elem.official === 0);
       setUnOfficialCol(unnColl._id);
 
-      cardRequests.getUserCards(col)
-      .then((cards) => {
-        console.log(cards);
+      cardRequests.getUserCards(col).then((cards) => {
         setOfficialCards(cards);
         setFilteredOfficialCards(cards);
-      })
-    })
-      
+      });
+    });
+
     if (loggedUser.admin) {
-      userRequests.getAllUsers()
-      .then((users) => {
+      userRequests.getAllUsers().then((users) => {
         const allUsers = users.filter((user) => user._id !== loggedUser._id);
         setUsers(allUsers);
-      })
+      });
     }
-  }, [loggedUser._id]);
-/*
-  //Delete Operations
-  useEffect(() => {
-    if (deletingCardID !== null) {
-      fetch(`/api/card/${deletingCardID}`, { method: "delete" })
-        .then(() => {
-          const cardsNiche = cards.filter(
-            (card) => card._id !== deletingCardID
-          );
-          setOfficialCards(cardsNiche);
-          setFilteredOfficialCards(cardsNiche);
-          setDeletingCard(null);
-        })
-        .catch((error) => {
-          console.log("Error Deleting Card");
-        });
-    }
-  }, [deletingCardID]);
+  }, [loggedUser]);
 
-  useEffect(() => {
-    if (deletingColID !== null && unOfficialCol !== null) {
-      fetch(`/api/collection/${deletingColID}/${unOfficialCol}/`, {
-        method: "delete",
-      })
-        .then(() => {
-          const colsNiche = collections.filter(
-            (col) => col.id !== deletingColID
-          );
-          setCollections(colsNiche);
-          setFilteredCollections(colsNiche);
-          setDeletingCol(null);
-        })
-        .catch((error) => {});
-    }
-  }, [deletingColID]);
-
-  //Post methods
-  useEffect(() => {
-    if (saveEditedCard !== null) {
-    }
-  }, [saveEditedCard]);
-*/
   //Handle Functions
 
   const handleViewMode = (value) => {
@@ -131,7 +82,7 @@ function UserPage({ loggedUser }) {
 
     if (!viewCardsModal) {
       const nameCollection = collections.find((col) => {
-        if (col && col._id == colId) {
+        if (col && col._id === colId) {
           return col.colName;
         }
         return "";
@@ -140,7 +91,7 @@ function UserPage({ loggedUser }) {
       setModalColName(nameCollection.colName);
 
       const amostra = cards.filter((card) => {
-        return card.collectionId == colId;
+        return card.collectionId === colId;
       });
 
       setModalCards(amostra);
@@ -160,12 +111,48 @@ function UserPage({ loggedUser }) {
     setFilteredCollections(colNiche);
   };
 
-  const handleCardDelete = (id) => {
-    setDeletingCard(id);
+  const handleCardDelete = (deletingCardId) => {
+    if (deletingCardId !== null) {
+      cardRequests
+        .deleteCard(deletingCardId)
+        .then((ans) => {
+          const cardsNiche = cards.filter(
+            (card) => card._id !== deletingCardId
+          );
+          setOfficialCards(cardsNiche);
+          setFilteredOfficialCards(cardsNiche);
+        })
+        .catch((error) => {
+          console.log("Error Deleting Card: " + error);
+        });
+    }
   };
 
-  const handleColDelete = (id) => {
-    setDeletingCol(id);
+  const handleColDelete = (deletingColId) => {
+    collectionRequests
+      .deleteCollection(deletingColId)
+      .then(() => {
+        const colsNiche = collections.filter(
+          (col) => col._id !== deletingColId
+        );
+        setCollections(colsNiche);
+        setFilteredCollections(colsNiche);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleUserDelete = (deleteUserId) => {
+    userRequests
+      .deleteUser(deleteUserId)
+      .then(() => {
+        const userNiche = collections.filter((col) => col._id !== deleteUserId);
+        setUsers(userNiche);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handleViewEditCardModal = (id) => {
@@ -203,14 +190,43 @@ function UserPage({ loggedUser }) {
   };
 
   const handleSaveEditCollectionModal = (name) => {
-    console.log(name);
+    //I am editing
+    if (collectionEditModal._id) {
+      const newCollection = JSON.stringify({
+        colName: name.value,
+      });
+
+      collectionRequests
+        .updateCollection(collectionEditModal._id, newCollection)
+        .then((res) => res.json())
+        .then((col) => {
+          console.log(col);
+        })
+        .catch((error) => {
+          console.log("Error Editing Collection: " + error);
+        });
+    }
+    //I am creating
+    else {
+      const newCollection = JSON.stringify({
+        official: 1,
+        colName: name.value,
+        userId: loggedUser._id,
+      });
+      collectionRequests
+        .createCollection(newCollection)
+        .then((newColl) => {
+          const clone = collections;
+          clone.push(newColl);
+          setCollections(clone);
+        })
+        .catch((error) => {
+          console.log("Error Creating Collection: " + error);
+        });
+    }
   };
 
   const handleSaveEditUsersModal = (name) => {
-    console.log(name);
-  };
-
-  const handleUserDelete = (name) => {
     console.log(name);
   };
 
@@ -219,7 +235,6 @@ function UserPage({ loggedUser }) {
   };
 
   const handleViewEditUserModal = (id) => {
-    console.log(id);
     setViewEditUsersModal(!viewEditUsersModal);
     if (!viewEditUsersModal) {
       const desiredUser = users.find((user) => user._id === id);
@@ -236,37 +251,41 @@ function UserPage({ loggedUser }) {
         cardName: name.value,
         value: valor.value,
         description: description.value,
-        collectionId: "634599e5de9a666b84728ee8",
       });
 
-      console.log(newCard);
-
-      fetch(`http://localhost:3001/api/card/${cardEditModal._id}`, {
-        method: "PATCH",
-        body: newCard,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+      cardRequests
+        .updateCard(cardEditModal._id, newCard)
         .then((res) => res.json())
-        .then((cards) => {
-          console.log(cards);
+        .then((received) => {
+          const alterCard = cards.find((card, index) => {
+            if (card._id === cardEditModal._id) {
+              return index;
+            }
+          });
         })
         .catch((error) => {
-          console.log("Error Editig Card: " + error);
+          console.log("Error Editing Card: " + error);
         });
     }
     //I am creating
     else {
-      console.log("Pedido de put");
+      const newCard = JSON.stringify({
+        cardName: name.value,
+        value: valor.value,
+        description: description.value,
+        collectionId: unOfficialCol,
+      });
+      cardRequests
+        .createCard(newCard)
+        .then((createdCard) => {
+          const clone = cards;
+          clone.push(createdCard);
+          setOfficialCards(clone);
+        })
+        .catch((error) => {
+          console.log("Error Creating Card: " + error);
+        });
     }
-
-    /* const newCard = `{
-            id:${cardEditModal.id},
-            cardName:${name.value},
-            value:${valor.value},
-            description:${description.value},
-        }`;*/
   };
 
   //Props definitions
@@ -277,6 +296,7 @@ function UserPage({ loggedUser }) {
     handleViewEditCollectionModal,
     handleViewEditUserModal,
     handleViewUsersModal,
+    handleUserLogout,
     loggedUser,
   };
 
@@ -320,7 +340,7 @@ function UserPage({ loggedUser }) {
 
   let getCardCol = (collectionId) => {
     if (collections) {
-      let collection = collections.find((col) => col._id == collectionId);
+      let collection = collections.find((col) => col._id === collectionId);
 
       return collection ? collection.colName : "None";
     }
@@ -345,21 +365,18 @@ function UserPage({ loggedUser }) {
   //Fill in variable with list of collections to display
   if (filteredCollections) {
     collectionList = filteredCollections.map((collection, index) => {
-      if (collection) {
-        let displayProps = {
-          collection,
-          index,
-          handleViewCardsModal,
-          handleViewEditCollectionModal,
-          handleColDelete,
-        };
-        return <InfoDisplay key={index} {...displayProps}></InfoDisplay>;
-      }
+      let displayProps = {
+        collection,
+        index,
+        handleViewCardsModal,
+        handleViewEditCollectionModal,
+        handleColDelete,
+      };
+      return <InfoDisplay key={index} {...displayProps}></InfoDisplay>;
     });
   }
 
   //Conditional Rendering according with view mode
-
   switch (viewMode) {
     case 1:
       lists = (
@@ -404,27 +421,15 @@ function UserPage({ loggedUser }) {
         <HeaderNav {...headerProps} style={{ width: "100%" }}></HeaderNav>
       </div>
       <div className="body">{lists}</div>
-      {viewCardsModal ? <CardsModal {...cardsModalProps}></CardsModal> : <></>}
-      {viewEditCardModal ? (
-        <EditCardModal {...editCardsModalProps}></EditCardModal>
-      ) : (
-        <></>
-      )}
-      {viewEditCollectionModal ? (
-        <EditColModal {...editCollectionsModalProps}></EditColModal>
-      ) : (
-        <></>
-      )}
-      {viewUsersModal ? (
-        <UserOpsModal {...usersModalProps}></UserOpsModal>
-      ) : (
-        <></>
-      )}
-      {viewEditUsersModal ? (
-        <EditUserModal {...editUsersModalProps}></EditUserModal>
-      ) : (
-        <></>
-      )}
+      <CardsModal {...cardsModalProps}></CardsModal>
+
+      <EditCardModal {...editCardsModalProps}></EditCardModal>
+
+      <EditColModal {...editCollectionsModalProps}></EditColModal>
+
+      <UserOpsModal {...usersModalProps}></UserOpsModal>
+
+      <EditUserModal {...editUsersModalProps}></EditUserModal>
     </div>
   );
 }

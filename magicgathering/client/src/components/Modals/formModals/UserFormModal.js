@@ -6,9 +6,17 @@ import Form from "react-bootstrap/Form";
 import FormEntry from "./FormEntry.js";
 
 function EditUserModal({ user, handleClose, handleSave, show }) {
-  const username = useRef(user.userName);
-  const realName = useRef(user.realName);
-  const admin = useRef(user.admin);
+  const username = useRef(user ? user.userName : null);
+  const realName = useRef(user ? user.realName : null);
+  const admin = useRef(user ? user.admin : null);
+
+  if (!show) {
+    return (
+      <AdaptativeModal
+        props={(handleClose, handleSave, show)}
+      ></AdaptativeModal>
+    );
+  }
 
   const modalTitle = "Edit User " + user.userName;
   const footer = true;

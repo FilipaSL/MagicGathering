@@ -6,9 +6,17 @@ import Form from "react-bootstrap/Form";
 import FormEntry from "./FormEntry.js";
 
 function EditCardModal({ card, handleClose, handleSave, show }) {
-  const name = useRef(card.cardName);
-  const valor = useRef(card.value);
-  const description = useRef(card.description);
+  const name = useRef(card ? card.cardName : null);
+  const valor = useRef(card ? card.value : null);
+  const description = useRef(card ? card.description : null);
+
+  if (!show) {
+    return (
+      <AdaptativeModal
+        props={(handleClose, handleSave, show)}
+      ></AdaptativeModal>
+    );
+  }
 
   const modalTitle = card.cardName
     ? "Edit card " + card.cardName

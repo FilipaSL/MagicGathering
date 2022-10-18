@@ -6,7 +6,15 @@ import Form from "react-bootstrap/Form";
 import FormEntry from "./FormEntry.js";
 
 function EditCollectionModal({ collection, handleClose, handleSave, show }) {
-  const name = useRef(collection.colName);
+  const name = useRef(collection ? collection.colName : null);
+
+  if (!show) {
+    return (
+      <AdaptativeModal
+        props={(handleClose, handleSave, show)}
+      ></AdaptativeModal>
+    );
+  }
 
   const modalTitle = collection.colName
     ? "Edit collection " + collection.colName

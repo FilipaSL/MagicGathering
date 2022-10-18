@@ -15,7 +15,11 @@ const collectionRequests = {
   },
   deleteCollection: (id) => {
     try {
-      const ans = sendRequest(`/collections/delete/${id}`, "DELETE");
+      const ans = sendRequest(`/collections/delete/${id}`, "DELETE").then(
+        (data) => {
+          return data;
+        }
+      );
       return ans;
     } catch (error) {
       console.log(error);
@@ -23,7 +27,11 @@ const collectionRequests = {
   },
   updateCollection: (id, body) => {
     try {
-      const ans = sendRequest(`/collections/update/${id}`, "PUT", body);
+      const ans = sendRequest(`/collections/update/${id}`, "PUT", body).then(
+        (data) => {
+          return data;
+        }
+      );
       return ans;
     } catch (error) {
       console.log(error);
@@ -31,7 +39,9 @@ const collectionRequests = {
   },
   createCollection: (body) => {
     try {
-      const ans = sendRequest(`collections/new`, "POST", body);
+      const ans = sendRequest(`collections/new`, "POST", body).then((data) => {
+        return data;
+      });
       return ans;
     } catch (error) {
       console.log(error);
