@@ -7,8 +7,8 @@ const collectionRequests = {
     });
     return collections;
   },
-  getAllCollectionsFromUser: (id) => {
-    const collections = sendRequest(`/collections/all/${id}`).then((data) => {
+  getAllCollectionsFromUser: () => {
+    const collections = sendRequest(`/collections/all`).then((data) => {
       return data;
     });
     return collections;
@@ -22,7 +22,7 @@ const collectionRequests = {
       );
       return ans;
     } catch (error) {
-      console.log(error);
+      return error;
     }
   },
   updateCollection: (id, body) => {
@@ -34,7 +34,7 @@ const collectionRequests = {
       );
       return ans;
     } catch (error) {
-      console.log(error);
+      return error;
     }
   },
   createCollection: (body) => {
@@ -44,7 +44,7 @@ const collectionRequests = {
       });
       return ans;
     } catch (error) {
-      console.log(error);
+      return error;
     }
   },
 };

@@ -2,9 +2,13 @@ const User = require("../models/user.model");
 const { ObjectId } = require("mongodb");
 const generateToken = require("../utils/generateToken.js");
 const responseFormat = require("../utils/responseFormat");
+const { verifyIsAdmin } = require("./helpers/helpers");
 
 //Get all users
 const getAllUsers = async (req, res) => {
+  if (!verifyIsAdmin(res, req.user.admin)) {
+    return;
+  }
   await User.find()
     .then((allUsers) => {
       responseFormat.data = allUsers;
@@ -19,6 +23,9 @@ const getAllUsers = async (req, res) => {
 
 //Create a new User
 const postUser = (req, res) => {
+  if (!verifyIsAdmin(res, req.user.admin)) {
+    return;
+  }
   const newUser = new User(req.body);
   newUser
     .save()
@@ -36,6 +43,9 @@ const postUser = (req, res) => {
 
 //Delete one User
 const deleteUser = async (req, res) => {
+  if (!verifyIsAdmin(res, req.user.admin)) {
+    return;
+  }
   const id = req.params.id;
   const searchId = new ObjectId(id);
   await User.deleteOne({ _id: searchId })
@@ -53,6 +63,9 @@ const deleteUser = async (req, res) => {
 
 //Update one User
 const updateUser = async (req, res) => {
+  if (!verifyIsAdmin(res, req.user.admin)) {
+    return;
+  }
   const id = req.params.id;
   const body = req.body;
   const searchId = new ObjectId(id);

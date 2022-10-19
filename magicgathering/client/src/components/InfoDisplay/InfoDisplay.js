@@ -133,7 +133,7 @@ function InfoDisplay({
             <Button
               size="sm"
               variant="secondary"
-              onClick={() => handleUserDelete(collection._id)}
+              onClick={() => handleUserDelete(user._id)}
             >
               Delete
             </Button>

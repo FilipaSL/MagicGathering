@@ -15,7 +15,7 @@ const cardsRequest = {
         return data.flat();
       });
     } catch (error) {
-      console.log(error);
+      return error;
     }
   },
 
@@ -24,7 +24,7 @@ const cardsRequest = {
       const ans = await sendRequest(`/cards/delete/${id}`, "DELETE");
       return ans;
     } catch (error) {
-      console.log(error);
+      return error;
     }
   },
   updateCard: (id, body) => {
@@ -36,19 +36,17 @@ const cardsRequest = {
       );
       return ans;
     } catch (error) {
-      console.log(error);
+      return error;
     }
   },
   createCard: (body) => {
     try {
       const ans = sendRequest(`cards/new`, "POST", body).then((data) => {
-        console.log("Create data:::");
-        console.log(data);
         return data;
       });
       return ans;
     } catch (error) {
-      console.log(error);
+      return error;
     }
   },
 };

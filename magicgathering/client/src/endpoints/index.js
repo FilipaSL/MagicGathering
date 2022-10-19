@@ -27,7 +27,10 @@ module.exports = {
     })
       .then((res) => res.json())
       .then((data) => {
-        return data.data;
+        if (!data || data.data === null) {
+          return null;
+        }
+        return data;
       })
       .catch((error) => {
         return error;

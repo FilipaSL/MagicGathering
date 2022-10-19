@@ -1,10 +1,13 @@
 const Card = require("../models/card.model");
 const responseFormat = require("../utils/responseFormat");
 const { ObjectId } = require("mongodb");
-const { response } = require("express");
+const { verifyCardRequestUser, verifyIsAdmin } = require("./helpers/helpers");
 
 //Get all cards
 const getAllCards = async (req, res) => {
+  if (!verifyIsAdmin(res, req.user._id)) {
+    return;
+  }
   await Card.find()
     .then((allCards) => {
       responseFormat.data = allCards;
@@ -18,6 +21,9 @@ const getAllCards = async (req, res) => {
 
 //Get one card
 const getOneCard = async (req, res) => {
+  if (!verifyIsAdmin(res, req.user._id)) {
+    return;
+  }
   const id = req.params.id;
   const searchId = new ObjectId(id);
   await Card.findById(searchId)
@@ -35,6 +41,9 @@ const getOneCard = async (req, res) => {
 const getCollectionCards = async (req, res) => {
   const id = req.params.id;
   const searchId = new ObjectId(id);
+  if (!verifyCardRequestUser(res, req.user._id, searchId)) {
+    return;
+  }
   await Card.find({ collectionId: searchId })
     .then((cards) => {
       responseFormat.data = cards;
@@ -48,6 +57,9 @@ const getCollectionCards = async (req, res) => {
 
 //Create new Card
 const postCard = (req, res) => {
+  if (!verifyCardRequestUser(res, req.user._id, req.body.collectionId)) {
+    return;
+  }
   const newCard = new Card(req.body);
   newCard
     .save()
@@ -56,7 +68,7 @@ const postCard = (req, res) => {
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
-      responseFormat.message = err;
+      responseFormat.message = err.message;
       res.status(400).json(responseFormat);
     });
 };
@@ -65,8 +77,15 @@ const postCard = (req, res) => {
 const deleteCard = async (req, res) => {
   const id = req.params.id;
   const searchId = new ObjectId(id);
+
   await Card.deleteOne({ _id: searchId })
-    .then(() => {
+    .then((ans) => {
+      if (ans.deletedCount === 0) {
+        responseFormat.data = null;
+        responseFormat.message = "Nothing to delete";
+        res.status(400).json(responseFormat);
+      }
+
       responseFormat.message = "Success deleting";
       res.status(200).json(responseFormat);
     })
@@ -81,6 +100,9 @@ const updateCard = async (req, res) => {
   const id = req.params.id;
   const body = req.body;
   const searchId = new ObjectId(id);
+  if (!verifyCardRequestUser(res, req.user._id, req.body.collectionId)) {
+    return;
+  }
   await Card.findByIdAndUpdate(searchId, body, { new: true })
     .then((newCard) => {
       responseFormat.data = newCard;

@@ -15,7 +15,7 @@ const userRequests = {
     return users;
   },
   deleteUser: (id) => {
-    const status = sendRequest(`/users/delete/${id}`).then((data) => {
+    const status = sendRequest(`/users/delete/${id}`, "DELETE").then((data) => {
       return data;
     });
     return status;
@@ -29,7 +29,7 @@ const userRequests = {
       );
       return ans;
     } catch (error) {
-      console.log(error);
+      return error;
     }
   },
   createUser: (body) => {
@@ -39,7 +39,7 @@ const userRequests = {
       });
       return ans;
     } catch (error) {
-      console.log(error);
+      return error;
     }
   },
 };

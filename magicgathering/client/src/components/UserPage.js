@@ -10,7 +10,7 @@ import InfoDisplay from "./InfoDisplay/InfoDisplay";
 import cardRequests from "../endpoints/cards.endpoint";
 import userRequests from "../endpoints/users.endpoint";
 import collectionRequests from "../endpoints/collections.endpoint";
-
+import AlertBar from "./AlertBar";
 import "./UserPage.css";
 
 function UserPage({ loggedUser, handleUserLogout }) {
@@ -45,19 +45,28 @@ function UserPage({ loggedUser, handleUserLogout }) {
   const [viewEditUsersModal, setViewEditUsersModal] = useState(false);
   const [userEditModal, setUserToEditModal] = useState(null);
 
+  const [viewAlertBar, setViewAlertBar] = useState(false);
+  const [alertBarProps, setAlertBarProps] = useState(null);
+
   //view Mode
   const [viewMode, setViewMode] = useState(3);
 
-  //GET Operations
+  //GET Operationsreturn;
   useEffect(() => {
-    collectionRequests.getAllCollectionsFromUser(loggedUser._id).then((col) => {
+    collectionRequests.getAllCollectionsFromUser().then((response) => {
+      const col = response.data;
+      if (houstonWeHaveAnError(response)) return;
+
       const showCollections = col.filter((elem) => elem.official === 1);
       setCollections(showCollections);
       setFilteredCollections(showCollections);
       const unnColl = col.find((elem) => elem.official === 0);
       setUnOfficialCol(unnColl._id);
 
-      cardRequests.getUserCards(col).then((cards) => {
+      cardRequests.getUserCards(col).then((resp) => {
+        cards = resp.data;
+        if (houstonWeHaveAnError(resp)) return;
+
         setOfficialCards(cards);
         setFilteredOfficialCards(cards);
       });
@@ -75,6 +84,10 @@ function UserPage({ loggedUser, handleUserLogout }) {
 
   const handleViewMode = (value) => {
     setViewMode(value);
+  };
+
+  const handleViewAlert = (value) => {
+    setViewAlertBar(value);
   };
 
   const handleViewCardsModal = (colId) => {
@@ -116,6 +129,8 @@ function UserPage({ loggedUser, handleUserLogout }) {
       cardRequests
         .deleteCard(deletingCardId)
         .then((ans) => {
+          if (houstonWeHaveAnError(ans)) return;
+
           const cardsNiche = cards.filter(
             (card) => card._id !== deletingCardId
           );
@@ -123,7 +138,7 @@ function UserPage({ loggedUser, handleUserLogout }) {
           setFilteredOfficialCards(cardsNiche);
         })
         .catch((error) => {
-          console.log("Error Deleting Card: " + error);
+          houstonWeHaveAnError("Error Deleting Card: " + error);
         });
     }
   };
@@ -131,7 +146,9 @@ function UserPage({ loggedUser, handleUserLogout }) {
   const handleColDelete = (deletingColId) => {
     collectionRequests
       .deleteCollection(deletingColId)
-      .then(() => {
+      .then((ans) => {
+        if (houstonWeHaveAnError(ans)) return;
+
         const colsNiche = collections.filter(
           (col) => col._id !== deletingColId
         );
@@ -139,19 +156,21 @@ function UserPage({ loggedUser, handleUserLogout }) {
         setFilteredCollections(colsNiche);
       })
       .catch((error) => {
-        console.log(error);
+        houstonWeHaveAnError("Error Deleting Collection: " + error);
       });
   };
 
   const handleUserDelete = (deleteUserId) => {
     userRequests
       .deleteUser(deleteUserId)
-      .then(() => {
+      .then((ans) => {
+        if (houstonWeHaveAnError(ans)) return;
+
         const userNiche = collections.filter((col) => col._id !== deleteUserId);
         setUsers(userNiche);
       })
       .catch((error) => {
-        console.log(error);
+        houstonWeHaveAnError("Error Deleting User: " + error);
       });
   };
 
@@ -198,12 +217,21 @@ function UserPage({ loggedUser, handleUserLogout }) {
 
       collectionRequests
         .updateCollection(collectionEditModal._id, newCollection)
-        .then((res) => res.json())
         .then((col) => {
-          console.log(col);
+          if (houstonWeHaveAnError(col)) return;
+
+          const newColList = collections.map((coll) => {
+            if (coll._id === collectionEditModal._id) {
+              return col;
+            }
+            return coll;
+          });
+          const filter = newColList.filter((elem) => elem.official === 1);
+          setCollections(newColList);
+          setFilteredCollections(filter);
         })
         .catch((error) => {
-          console.log("Error Editing Collection: " + error);
+          houstonWeHaveAnError("Error Editing Collection: " + error);
         });
     }
     //I am creating
@@ -211,17 +239,18 @@ function UserPage({ loggedUser, handleUserLogout }) {
       const newCollection = JSON.stringify({
         official: 1,
         colName: name.value,
-        userId: loggedUser._id,
       });
       collectionRequests
         .createCollection(newCollection)
         .then((newColl) => {
+          if (houstonWeHaveAnError(newColl)) return;
+
           const clone = collections;
           clone.push(newColl);
           setCollections(clone);
         })
         .catch((error) => {
-          console.log("Error Creating Collection: " + error);
+          houstonWeHaveAnError("Error Creating Collection: " + error);
         });
     }
   };
@@ -257,14 +286,18 @@ function UserPage({ loggedUser, handleUserLogout }) {
         .updateCard(cardEditModal._id, newCard)
         .then((res) => res.json())
         .then((received) => {
-          const alterCard = cards.find((card, index) => {
+          if (houstonWeHaveAnError(received)) return;
+
+          const alterCards = cards.map((card) => {
             if (card._id === cardEditModal._id) {
-              return index;
+              return received;
             }
+            return card;
           });
+          setOfficialCards(alterCards);
         })
         .catch((error) => {
-          console.log("Error Editing Card: " + error);
+          houstonWeHaveAnError("Error Editing Card: " + error);
         });
     }
     //I am creating
@@ -278,12 +311,13 @@ function UserPage({ loggedUser, handleUserLogout }) {
       cardRequests
         .createCard(newCard)
         .then((createdCard) => {
+          if (houstonWeHaveAnError(createdCard)) return;
           const clone = cards;
           clone.push(createdCard);
           setOfficialCards(clone);
         })
         .catch((error) => {
-          console.log("Error Creating Card: " + error);
+          houstonWeHaveAnError("Error Creating Card: " + error);
         });
     }
   };
@@ -345,6 +379,21 @@ function UserPage({ loggedUser, handleUserLogout }) {
       return collection ? collection.colName : "None";
     }
     return "None";
+  };
+
+  const houstonWeHaveAnError = (obj) => {
+    if (obj.data == null) {
+      setViewAlertBar(true);
+
+      setAlertBarProps({
+        show: viewAlertBar,
+        handleClose: handleViewAlert,
+        message: obj.message,
+        variant: "danger",
+      });
+      return false;
+    }
+    return true;
   };
 
   //Fill in variable with list of cards to display
@@ -417,6 +466,7 @@ function UserPage({ loggedUser, handleUserLogout }) {
 
   return (
     <div className="userPage">
+      <AlertBar {...alertBarProps}></AlertBar>
       <div className="header">
         <HeaderNav {...headerProps} style={{ width: "100%" }}></HeaderNav>
       </div>
