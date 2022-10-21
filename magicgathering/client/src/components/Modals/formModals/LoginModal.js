@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { Button, Form } from "react-bootstrap";
-import AdaptativeModal from "./AdaptativeModal.js";
+import AdaptativeModal from "../AdaptativeModal.js";
 
 function LoginModal(props) {
   const email = useRef(null);

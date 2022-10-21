@@ -1,11 +1,7 @@
 const Collection = require("../models/collection.model");
 const { ObjectId } = require("mongodb");
 const responseFormat = require("../utils/responseFormat");
-const {
-  verifyCollRequestUser,
-  verifyIsAdmin,
-  collectionFilter,
-} = require("./helpers/helpers");
+const { verifyIsAdmin, collectionFilter } = require("./helpers/helpers");
 
 //Get all collections
 const getAllCollections = async (req, res) => {
@@ -25,8 +21,9 @@ const getAllCollections = async (req, res) => {
 
 //Get one unnoficial collection
 const getUnCollection = async (req, res) => {
-  const id = req.params.id;
+  const id = req.user.id;
   const searchId = new ObjectId(id);
+  //no need for verification because it only gets info from the logged user
 
   await Collection.findOne({ userId: searchId, official: 0 })
     .then((col) => {
@@ -43,6 +40,8 @@ const getUnCollection = async (req, res) => {
 const getAllUserCollections = async (req, res) => {
   const id = req.user.id;
   const searchId = new ObjectId(id);
+
+  //no need for verification because it only gets info from the logged user
 
   await Collection.find({ userId: searchId })
     .then((col) => {
@@ -104,9 +103,9 @@ const updateCollection = async (req, res) => {
       if (!resp) {
         responseFormat.message = "Collection not found.";
         res.status(404).json(responseFormat);
+      } else {
+        res.status(200).json(responseFormat);
       }
-      responseFormat.data = resp;
-      res.status(200).json(responseFormat);
     })
     .catch((err) => {
       responseFormat.message = err;

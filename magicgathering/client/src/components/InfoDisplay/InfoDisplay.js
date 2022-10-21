@@ -17,6 +17,7 @@ function InfoDisplay({
   handleViewCardsModal,
   handleViewEditCollectionModal,
   handleViewEditUserModal,
+  handleChangeCardCollection,
   getCardCol,
 }) {
   if (isCard && card) {
@@ -53,6 +54,17 @@ function InfoDisplay({
             >
               Edit
             </Button>
+            {handleChangeCardCollection ? (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => handleChangeCardCollection(card._id)}
+              >
+                Change Collection
+              </Button>
+            ) : (
+              <></>
+            )}
             <Button
               size="sm"
               variant="secondary"

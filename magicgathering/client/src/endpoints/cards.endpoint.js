@@ -11,8 +11,18 @@ const cardsRequest = {
             return ans;
           })
         )
-      ).then((data) => {
-        return data.flat();
+      ).then((resp) => {
+        if (resp !== null) {
+          let dataInfo = {
+            data: [],
+            message: "",
+          };
+          dataInfo.data = resp.map((cards) => cards.data);
+          dataInfo.data = dataInfo.data.flat();
+
+          return dataInfo;
+        }
+        return resp;
       });
     } catch (error) {
       return error;

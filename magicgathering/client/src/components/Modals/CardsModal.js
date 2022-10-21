@@ -17,7 +17,6 @@ function CardsModal({
   const footer = false;
   let cardsList = [];
 
-
   const modalProps = {
     modalTitle,
     footer,

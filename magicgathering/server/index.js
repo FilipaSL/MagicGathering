@@ -14,6 +14,8 @@ const mongoose = require("mongoose");
 const userRoutes = require("./api/routes/user.routes");
 const cardRoutes = require("./api/routes/card.routes");
 const collectionRoutes = require("./api/routes/collection.routes");
+const loginRoutes = require("./api/routes/login.routes");
+
 const authMiddleware = require("./middleware/authMiddleware");
 
 const { allowedDomains } = config;
@@ -45,6 +47,8 @@ connection.once("open", () => {
 app.use("/users", userRoutes);
 app.use("/cards", cardRoutes);
 app.use("/collections", collectionRoutes);
+app.use("/login", loginRoutes);
+
 app.use(authMiddleware.protect);
 
 app.listen(PORT, () => {

@@ -28,17 +28,20 @@ const protect = async (req, res, next) => {
       next();
     } catch (error) {
       res.status(401).json("Error! " + error);
+      return;
     }
   }
 
   if (!token) {
     res.status(401);
     res.status(401).json("Not authorized, no token! ");
+    return;
   }
 
   if (!req.user) {
     res.status(401);
     res.status(401).json("Not authorized, user does not exists! ");
+    return;
   }
 };
 

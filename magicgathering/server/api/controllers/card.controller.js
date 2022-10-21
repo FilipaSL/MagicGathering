@@ -84,10 +84,10 @@ const deleteCard = async (req, res) => {
         responseFormat.data = null;
         responseFormat.message = "Nothing to delete";
         res.status(400).json(responseFormat);
+      } else {
+        responseFormat.message = "Success deleting";
+        res.status(200).json(responseFormat);
       }
-
-      responseFormat.message = "Success deleting";
-      res.status(200).json(responseFormat);
     })
     .catch((err) => {
       responseFormat.message = err;
@@ -99,6 +99,7 @@ const deleteCard = async (req, res) => {
 const updateCard = async (req, res) => {
   const id = req.params.id;
   const body = req.body;
+
   const searchId = new ObjectId(id);
   if (!verifyCardRequestUser(res, req.user._id, req.body.collectionId)) {
     return;

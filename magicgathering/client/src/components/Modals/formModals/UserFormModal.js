@@ -42,7 +42,11 @@ function EditUserModal({ user, handleClose, handleSave, show }) {
           label="Real Name"
           refer={realName}
         />
-        <FormEntry defValue={user.admin} label="Admin" refer={admin} />
+        {user.admin ? (
+          <FormEntry defValue={user.admin} label="Admin" refer={admin} />
+        ) : (
+          <></>
+        )}
       </Form>
     </AdaptativeModal>
   );

@@ -8,27 +8,27 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
 function HeaderNav({
-  handleViewMode,
-  handleSearch,
-  handleViewEditCardModal,
-  handleViewEditCollectionModal,
-  handleViewEditUserModal,
-  handleViewUsersModal,
-  handleUserLogout,
+  viewMode,
+  search,
+  editCardModal,
+  editColModal,
+  editUserModal,
+  userModal,
+  logout,
   loggedUser,
 }) {
   const searchWord = useRef(null);
 
   const handleView = (value) => {
-    handleViewMode(value);
+    viewMode(value);
   };
 
   const handleSearchInput = () => {
-    handleSearch(searchWord.current.value);
+    search(searchWord.current.value);
   };
 
   const handleLogout = () => {
-    handleUserLogout();
+    logout();
   };
 
   return (
@@ -62,20 +62,20 @@ function HeaderNav({
             <NavDropdown title="Operations" id="basic-nav-dropdown">
               <NavDropdown.Item
                 href="#action/3.1"
-                onClick={() => handleViewEditCardModal()}
+                onClick={() => editCardModal()}
               >
                 Add Card
               </NavDropdown.Item>
               <NavDropdown.Item
                 href="#action/3.2"
-                onClick={() => handleViewEditCollectionModal()}
+                onClick={() => editColModal()}
               >
                 Add Collection
               </NavDropdown.Item>
               {loggedUser.admin ? (
                 <NavDropdown.Item
                   href="#action/3.3"
-                  onClick={() => handleViewUsersModal()}
+                  onClick={() => userModal()}
                 >
                   Manage Users
                 </NavDropdown.Item>
@@ -108,10 +108,7 @@ function HeaderNav({
         <Navbar.Collapse className="justify-content-end">
           <Navbar.Text>
             Signed in as:{" "}
-            <a
-              href="#login"
-              onClick={() => handleViewEditUserModal(loggedUser._id)}
-            >
+            <a href="#login" onClick={() => editUserModal(loggedUser._id)}>
               {loggedUser.realName}
             </a>
           </Navbar.Text>
