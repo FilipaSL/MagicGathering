@@ -7,7 +7,7 @@ const Schema = mongoose.Schema;
 // Create Schema Instance and add schema propertise
 const CardSchema = new Schema({
   value: {
-    type: Intl,
+    type: Number,
     required: true,
   },
   cardName: {

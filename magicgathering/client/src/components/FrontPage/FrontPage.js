@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Row from "react-bootstrap/Row";
 import CardsModal from "../Modals/CardsModal";
 import EditCardModal from "../Modals/formModals/CardFormModal";
 import EditColModal from "../Modals/formModals/ColFormModal";
@@ -7,17 +6,14 @@ import EditUserModal from "../Modals/formModals/UserFormModal";
 import UserOpsModal from "../Modals/UsersModal";
 import CollectionsModal from "../Modals/CollectionsModal";
 import HeaderNav from "../HeaderNav/HeaderNav";
-import InfoDisplay from "../InfoDisplay/InfoDisplay";
 import cardRequests from "../../endpoints/cards.endpoint";
 import userRequests from "../../endpoints/users.endpoint";
 import collectionRequests from "../../endpoints/collections.endpoint";
 import AlertBar from "../AlertBar/AlertBar";
+import ViewMode from "./helpers/ViewMode";
 import "./FrontPage.css";
 
 function FrontPage({ loggedUser, handleUserLogout }) {
-  let cardList;
-  let lists;
-  let collectionList;
   //User cards and collections
   const [collections, setCollections] = useState(null);
   const [cards, setOfficialCards] = useState(null);
@@ -186,7 +182,8 @@ function FrontPage({ loggedUser, handleUserLogout }) {
           return;
         }
 
-        const userNiche = collections.filter((col) => col._id !== deleteUserId);
+        const userNiche = users.filter((col) => col._id !== deleteUserId);
+
         setUsers(userNiche);
       })
       .catch((error) => {
@@ -419,6 +416,45 @@ function FrontPage({ loggedUser, handleUserLogout }) {
     }
   };
 
+  let getCardCol = (collectionId) => {
+    if (collections) {
+      let collection = collections.find((col) => col._id === collectionId);
+
+      return collection ? collection.colName : "None";
+    }
+    return "None";
+  };
+  const houstonWeHaveAnAlert = (obj, message = null) => {
+    if (obj.data === null) {
+      setViewAlertBar(true);
+      console.log("Houston we had an error");
+      setAlertBarProps({
+        handleClose: () => setViewAlertBar(false),
+        message: obj.message,
+        variant: "danger",
+      });
+      return true;
+    } else if (message) {
+      setViewAlertBar(true);
+      setAlertBarProps({
+        handleClose: () => setViewAlertBar(false),
+        message: message,
+        variant: "success",
+      });
+    }
+    return false;
+  };
+
+  const updateArray = (toUpdate, objectToAlter, checker) => {
+    const newArray = toUpdate.map((obj) => {
+      if (obj._id === checker) {
+        return objectToAlter;
+      }
+      return obj;
+    });
+    return newArray;
+  };
+
   //Props definitions
   const headerProps = {
     viewMode: handleViewMode,
@@ -478,114 +514,18 @@ function FrontPage({ loggedUser, handleUserLogout }) {
     handleClose: setViewCollectionModal,
   };
 
-  let getCardCol = (collectionId) => {
-    if (collections) {
-      let collection = collections.find((col) => col._id === collectionId);
-
-      return collection ? collection.colName : "None";
-    }
-    return "None";
+  const viewModeProps = {
+    viewMode,
+    filteredCards,
+    getCardCol,
+    filteredCollections,
+    handleCardDelete,
+    handleViewEditCardModal,
+    handleChangeCardCollection,
+    handleViewCardsModal,
+    handleViewEditCollectionModal,
+    handleColDelete,
   };
-
-  const updateArray = (toUpdate, objectToAlter, checker) => {
-    const newArray = toUpdate.map((obj) => {
-      if (obj._id === checker) {
-        return objectToAlter;
-      }
-      return obj;
-    });
-    return newArray;
-  };
-
-  const houstonWeHaveAnAlert = (obj, message = null) => {
-    if (obj.data === null) {
-      setViewAlertBar(true);
-      console.log("Houston we had an error");
-      setAlertBarProps({
-        handleClose: () => setViewAlertBar(false),
-        message: obj.message,
-        variant: "danger",
-      });
-      return true;
-    } else if (message) {
-      setViewAlertBar(true);
-      setAlertBarProps({
-        handleClose: () => setViewAlertBar(false),
-        message: message,
-        variant: "success",
-      });
-    }
-    return false;
-  };
-
-  //Fill in variable with list of cards to display
-  if (filteredCards) {
-    cardList = filteredCards.map((card, index) => {
-      let displayProps = {
-        isCard: true,
-        card,
-        index,
-        getCardCol,
-        handleCardDelete,
-        handleViewEditCardModal,
-        handleChangeCardCollection,
-      };
-      return <InfoDisplay key={index} {...displayProps}></InfoDisplay>;
-    });
-  }
-
-  //Fill in variable with list of collections to display
-  if (filteredCollections) {
-    collectionList = filteredCollections.map((collection, index) => {
-      let displayProps = {
-        collection,
-        index,
-        handleViewCardsModal,
-        handleViewEditCollectionModal,
-        handleColDelete,
-      };
-      return <InfoDisplay key={index} {...displayProps}></InfoDisplay>;
-    });
-  }
-
-  //Conditional Rendering according with view mode
-  switch (viewMode) {
-    case 1:
-      lists = (
-        <div>
-          <p>Your Cards</p>
-          <Row xs={2} md={3} className="justify-content-center">
-            {cardList}
-          </Row>
-        </div>
-      );
-      break;
-    case 2:
-      lists = (
-        <div>
-          <p>Your Collections</p>
-          <Row xs={2} md={3} className="justify-content-center">
-            {collectionList}
-          </Row>
-        </div>
-      );
-      break;
-    case 3:
-    default:
-      lists = (
-        <div>
-          <p>Your Cards</p>
-          <Row xs={2} md={3} className="justify-content-center">
-            {cardList}
-          </Row>
-
-          <p>Your Collections</p>
-          <Row xs={2} md={3} className="justify-content-center">
-            {collectionList}
-          </Row>
-        </div>
-      );
-  }
 
   return (
     <div className="FrontPage">
@@ -594,7 +534,9 @@ function FrontPage({ loggedUser, handleUserLogout }) {
       </div>
       {viewAlertBar ? <AlertBar {...alertBarProps}></AlertBar> : <></>}
 
-      <div className="body">{lists}</div>
+      <div className="body">
+        <ViewMode {...viewModeProps} />
+      </div>
       <CardsModal {...cardsModalProps}></CardsModal>
 
       <EditCardModal {...editCardsModalProps}></EditCardModal>

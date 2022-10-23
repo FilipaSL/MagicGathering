@@ -6,6 +6,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import "./HeaderNav.css";
 
 function HeaderNav({
   viewMode,
@@ -32,13 +33,12 @@ function HeaderNav({
   };
 
   return (
-    <Navbar bg="light" variant="light">
-      <Container>
+    <Navbar className="header" bg="light" expand="md" variant="light">
+      <Container fluid>
         <Navbar.Brand href="#home">Main Menu</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
             <NavDropdown title="View Options" id="basic-nav-dropdown">
               <NavDropdown.Item
                 href="#action/3.1"

@@ -5,7 +5,7 @@ const { verifyCardRequestUser, verifyIsAdmin } = require("./helpers/helpers");
 
 //Get all cards
 const getAllCards = async (req, res) => {
-  if (!verifyIsAdmin(res, req.user._id)) {
+  if (!verifyIsAdmin(res, req.user.admin)) {
     return;
   }
   await Card.find()
@@ -21,7 +21,7 @@ const getAllCards = async (req, res) => {
 
 //Get one card
 const getOneCard = async (req, res) => {
-  if (!verifyIsAdmin(res, req.user._id)) {
+  if (!verifyIsAdmin(res, req.user.admin)) {
     return;
   }
   const id = req.params.id;
@@ -39,9 +39,12 @@ const getOneCard = async (req, res) => {
 
 //Get collection Cards
 const getCollectionCards = async (req, res) => {
-  const id = req.params.id;
-  const searchId = new ObjectId(id);
-  if (!verifyCardRequestUser(res, req.user._id, searchId)) {
+  const searchId = req.params.id;
+  const allowed = await verifyCardRequestUser(req.user, searchId);
+  if (!allowed) {
+    responseFormat.data = null;
+    responseFormat.message = "User has permission to make this alteration.";
+    res.status(400).json(responseFormat);
     return;
   }
   await Card.find({ collectionId: searchId })
@@ -56,8 +59,12 @@ const getCollectionCards = async (req, res) => {
 };
 
 //Create new Card
-const postCard = (req, res) => {
-  if (!verifyCardRequestUser(res, req.user._id, req.body.collectionId)) {
+const postCard = async (req, res) => {
+  const allowed = await verifyCardRequestUser(req.user, req.body.collectionId);
+  if (!allowed) {
+    responseFormat.data = null;
+    responseFormat.message = "User has permission to make this alteration.";
+    res.status(400).json(responseFormat);
     return;
   }
   const newCard = new Card(req.body);
@@ -101,7 +108,11 @@ const updateCard = async (req, res) => {
   const body = req.body;
 
   const searchId = new ObjectId(id);
-  if (!verifyCardRequestUser(res, req.user._id, req.body.collectionId)) {
+  const allowed = await verifyCardRequestUser(req.user, req.body.collectionId);
+  if (!allowed) {
+    responseFormat.data = null;
+    responseFormat.message = "User has permission to make this alteration.";
+    res.status(400).json(responseFormat);
     return;
   }
   await Card.findByIdAndUpdate(searchId, body, { new: true })

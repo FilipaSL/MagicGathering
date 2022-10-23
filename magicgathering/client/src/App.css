@@ -5,9 +5,7 @@
   justify-content: flex-start;
   text-align: center;
   background-color: #282c34;
-  color: antiquewhite;
-  height: 100vh;
-  height: 100vw;
+  overflow-x: hidden;
 }
 
 .appHeader {
@@ -17,4 +15,12 @@
   font-size: xx-large;
   font-weight: 500;
   padding: 4rem;
+}
+
+.mainPage {
+  height: 50vh;
+}
+
+.buttons {
+  margin: 1.5rem;
 }

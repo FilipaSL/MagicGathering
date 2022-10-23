@@ -7,7 +7,7 @@ const Schema = mongoose.Schema;
 // Create Schema Instance and add schema propertise
 const CollectionSchema = new Schema({
   official: {
-    type: Intl,
+    type: Number,
     required: true,
   },
   colName: {

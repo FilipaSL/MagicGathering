@@ -12,31 +12,24 @@ const verifyIsAdmin = (res, admin) => {
   return true;
 };
 
-const verifyCardRequestUser = async (res, requestUser, collectionId) => {
-  if (requestUser.admin === 0) {
-    await Collection.find({ _id: collectionId }).then((coll) => {
-      if (requestUser._id !== coll.userId) {
-        responseFormat.data = null;
-        responseFormat.message = "User has permission to make this alteration.";
-        res.status(400).json(responseFormat);
-        return false;
-      }
-      return true;
-    });
-  }
-  return true;
+const verifyCardRequestUser = async (requestUser, collectionId) => {
+  if (requestUser.admin === 1) return true;
+  const aux = await Collection.findOne({
+    _id: collectionId,
+    userId: requestUser._id,
+  });
+  return aux;
 };
 
 const verifyCollRequestUser = (res, requestUser, userId) => {
-  if (requestUser.admin === 0) {
-    if (requestUser._id !== userId) {
-      responseFormat.data = null;
-      responseFormat.message = "User has permission to make this alteration.";
-      res.status(400).json(responseFormat);
-      return false;
-    }
+  if (requestUser.admin === 1) return true;
+
+  if (requestUser._id !== userId) {
+    responseFormat.data = null;
+    responseFormat.message =
+      "User doesn't have permission to make this alteration.";
+    return res.status(400).json(responseFormat);
   }
-  return true;
 };
 
 const collectionFilter = (searchId, user) => {

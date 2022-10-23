@@ -5,7 +5,7 @@ const { verifyIsAdmin, collectionFilter } = require("./helpers/helpers");
 
 //Get all collections
 const getAllCollections = async (req, res) => {
-  if (!verifyIsAdmin(res, req.user._id)) {
+  if (!verifyIsAdmin(res, req.user.admin)) {
     return;
   }
   await Collection.find()

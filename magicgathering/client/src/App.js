@@ -97,11 +97,15 @@ function App() {
   };
 
   const Login = (
-    <div>
-      <Button variant="primary" onClick={handleShowLogin}>
+    <div className="login">
+      <Button className="buttons" variant="primary" onClick={handleShowLogin}>
         Login
       </Button>
-      <Button variant="primary" onClick={handleShowRegister}>
+      <Button
+        className="buttons"
+        variant="primary"
+        onClick={handleShowRegister}
+      >
         Register
       </Button>
       <LoginModal {...loginFormProps} />
@@ -109,7 +113,7 @@ function App() {
     </div>
   );
 
-  const AppBody = <FrontPage {...userProps}></FrontPage>;
+  const AppBody = <FrontPage className="mainPage" {...userProps}></FrontPage>;
 
   return (
     <div className="App">

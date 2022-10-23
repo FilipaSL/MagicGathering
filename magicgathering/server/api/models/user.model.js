@@ -8,7 +8,7 @@ const Schema = mongoose.Schema;
 // Create Schema Instance and add schema propertise
 const UserSchema = new Schema({
   admin: {
-    type: Intl,
+    type: Number,
     required: false,
   },
   userName: {
