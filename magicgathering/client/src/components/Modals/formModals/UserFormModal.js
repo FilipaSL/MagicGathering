@@ -5,7 +5,7 @@ import AdaptativeModal from "../AdaptativeModal.js";
 import Form from "react-bootstrap/Form";
 import FormEntry from "./FormEntry.js";
 
-function EditUserModal({ user, handleClose, handleSave, show }) {
+function EditUserModal({ user, handleClose, handleSave, show, requestUser}) {
   const username = useRef(user ? user.userName : null);
   const realName = useRef(user ? user.realName : null);
   const admin = useRef(user ? user.admin : null);
@@ -42,7 +42,7 @@ function EditUserModal({ user, handleClose, handleSave, show }) {
           label="Real Name"
           refer={realName}
         />
-        {user.admin ? (
+        {requestUser.admin ? (
           <FormEntry defValue={user.admin} label="Admin" refer={admin} />
         ) : (
           <></>

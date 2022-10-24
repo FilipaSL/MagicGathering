@@ -22,9 +22,14 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true,
-    select: false,
   },
 });
+
+const auxiliarPasswordConverter = async()=>{
+  const salt = await bcrypt.genSalt(10);
+  let password = await bcrypt.hash("123", salt);
+  //console.log(password)
+}
 
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);

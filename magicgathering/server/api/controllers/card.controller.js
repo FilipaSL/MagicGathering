@@ -72,7 +72,7 @@ const postCard = async (req, res) => {
   const allowed = await verifyCardRequestUser(req.user, req.body.collectionId);
   if (!allowed) {
     responseFormat.data = null;
-    responseFormat.message = "User has permission to make this alteration.";
+    responseFormat.message = "User does not have permission to make this alteration.";
     res.status(400).json(responseFormat);
     return;
   }
@@ -103,6 +103,7 @@ const deleteCard = async (req, res) => {
         responseFormat.data = null;
         responseFormat.message = "Nothing to delete";
         res.status(400).json(responseFormat);
+        return;
       } else {
         responseFormat.message = "Success deleting";
         res.status(200).json(responseFormat);
@@ -137,6 +138,7 @@ const updateCard = async (req, res) => {
       if (!newCard) {
         responseFormat.message = "Card not found.";
         res.status(404).json(responseFormat);
+        return
       }
       responseFormat.data = newCard;
       responseFormat.message = "Success updating";

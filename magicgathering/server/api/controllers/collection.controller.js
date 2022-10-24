@@ -11,6 +11,7 @@ const getAllCollections = async (req, res) => {
   await Collection.find()
     .then((allColl) => {
       responseFormat.data = allColl;
+      responseFormat.message = "";
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
@@ -32,6 +33,7 @@ const getUnCollection = async (req, res) => {
   await Collection.findOne({ userId: searchId, official: 0 })
     .then((col) => {
       responseFormat.data = col;
+      responseFormat.message = "";
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
@@ -43,7 +45,7 @@ const getUnCollection = async (req, res) => {
 
 //All user collections
 const getAllUserCollections = async (req, res) => {
-  if(!req.user ||!req.body){
+  if(!req.user){
     return
   }
   const id = req.user.id;
@@ -54,6 +56,29 @@ const getAllUserCollections = async (req, res) => {
   await Collection.find({ userId: searchId })
     .then((col) => {
       responseFormat.data = col;
+      responseFormat.message = "";
+      res.status(200).json(responseFormat);
+    })
+    .catch((err) => {
+      responseFormat.data = null;
+      responseFormat.message = err;
+      res.status(400).json(responseFormat);
+    });
+};
+
+const getAllCollectionsFromAnotherUser = async (req, res) => {
+  if(!req.user||!verifyIsAdmin(res, req.user.admin)){
+    return
+  }
+  const id = req.params.id;
+  const searchId = new ObjectId(id);
+
+  //no need for verification because it only gets info from the logged user
+
+  await Collection.find({ userId: searchId })
+    .then((col) => {
+      responseFormat.data = col;
+      responseFormat.message = "";
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
@@ -74,6 +99,7 @@ const postCollection = (req, res) => {
     .save()
     .then((col) => {
       responseFormat.data = col;
+      responseFormat.message = "";
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
@@ -95,6 +121,7 @@ const deleteCollection = async (req, res) => {
   await Collection.deleteOne(filter)
     .then((resp) => {
       responseFormat.data = resp;
+      responseFormat.message = "";
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
@@ -121,7 +148,9 @@ const updateCollection = async (req, res) => {
         responseFormat.data = null;
         responseFormat.message = "Collection not found.";
         res.status(404).json(responseFormat);
+        return;
       } else {
+        responseFormat.message = "";
         res.status(200).json(responseFormat);
       }
     })
@@ -139,4 +168,5 @@ module.exports = {
   postCollection,
   deleteCollection,
   updateCollection,
+  getAllCollectionsFromAnotherUser
 };

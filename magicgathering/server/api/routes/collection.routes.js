@@ -5,6 +5,8 @@ const router = require("express").Router();
 
 router.route("/").get(authM.protect, collectionRoutes.getAllCollections);
 router.route("/all").get(authM.protect, collectionRoutes.getAllUserCollections);
+router.route("/all/:id").get(authM.protect, collectionRoutes.getAllCollectionsFromAnotherUser);
+
 router.route("/clean/:id").get(authM.protect, collectionRoutes.getUnCollection);
 router.route("/new").post(authM.protect, collectionRoutes.postCollection);
 router

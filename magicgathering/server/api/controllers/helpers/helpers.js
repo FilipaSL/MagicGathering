@@ -47,9 +47,22 @@ const collectionFilter = (searchId, user) => {
   return filter;
 };
 
+const userPassResponseFilter= (userData)=>{
+  if (userData.password){
+    return {
+      _id: userData._id,
+      userName : userData.userName,
+      realName: userData.realName,
+      admin: userData.admin
+    }
+  }
+  return userData
+}
+
 module.exports = {
   verifyIsAdmin,
   verifyCardRequestUser,
   verifyCollRequestUser,
   collectionFilter,
+  userPassResponseFilter
 };

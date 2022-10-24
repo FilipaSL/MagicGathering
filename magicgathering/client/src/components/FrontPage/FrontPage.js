@@ -57,7 +57,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
   useEffect(() => {
     collectionRequests.getAllCollectionsFromUser().then((response) => {
       const col = response.data;
-      if (houstonWeHaveAnAlert(response, "Could not get all collections from user")) {
+      if (houstonWeHaveAnAlert(response)) {
         return;
       }
 
@@ -80,7 +80,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     if (loggedUser.admin) {
       userRequests.getAllUsers().then((data) => {
         const usersData = data.data;
-        if (houstonWeHaveAnAlert(data, "Coould not get user list")) {
+        if (houstonWeHaveAnAlert(data)) {
           return;
         }
 
@@ -352,7 +352,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
       const newUser = JSON.stringify({
         userName: userName.value,
         realName: realName.value,
-        admin: userEditModal.admin === 1 ? admin.value : userEditModal.admin,
+        admin: loggedUser.admin === 1 ? admin.value : userEditModal.admin,
       });
 
       userRequests
@@ -524,6 +524,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     handleClose: handleViewEditUserModal,
     user: userEditModal,
     handleSave: handleSaveEditUsersModal,
+    requestUser: loggedUser
   };
 
   const chooseNewColectionModalProps = {

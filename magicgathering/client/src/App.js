@@ -7,12 +7,16 @@ import { Button } from "react-bootstrap";
 import loginRequest from "./endpoints/login.endpoint";
 import FrontPage from "./components/FrontPage/FrontPage";
 import RegisterModal from "./components/Modals/formModals/RegisterModal";
+import AlertBar from "./components/AlertBar/AlertBar";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [loginError, setLoginError] = useState(null);
   const [loggedUser, setLoggedUser] = useState(null);
   const [loginInfo, setLoginInfo] = useState(null);
+
+  const [registerAlert, setRegisterAlert] = useState(false);
+  const [registerAlertProps, setRegisterAlertProps] = useState(null);
 
   const [showRegister, setShowRegister] = useState(false);
   const [registerError, setRegisterError] = useState(null);
@@ -66,12 +70,20 @@ function App() {
         .then((data) => {
           const user = data.data;
           if (user) {
-            setLoginInfo({ username: user.userName, password: password });
+            setRegisterAlertProps({
+              handleClose: () => {setRegisterAlert(false); setRegisterAlertProps(null)},
+              message: "User registered! You can login!",
+              variant: "success",
+            });
+            setRegisterAlert(true);
+
+            //setLoginInfo({ username: user.userName, password: user.password });
             handleCloseRegister();
           } else {
             setRegisterError(data.message);
           }
-        });
+        })
+        .catch((error)=>console.log(error));
     }
   };
 
@@ -101,6 +113,7 @@ function App() {
     handleLoggedUserEdit
   };
 
+
   const Login = (
     <div className="login">
       <Button className="buttons" variant="primary" onClick={handleShowLogin}>
@@ -114,6 +127,7 @@ function App() {
         Register
       </Button>
       <LoginModal {...loginFormProps} />
+      {registerAlert? <AlertBar {...registerAlertProps} />: <></>}
       <RegisterModal {...registerFormProps} />
     </div>
   );

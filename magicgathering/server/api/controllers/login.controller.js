@@ -6,12 +6,11 @@ const responseFormat = require("../utils/responseFormat");
 
 //Login User
 const loginUser = async (req, res) => {
-  const { userName } = req.body;
+  const { userName, password } = req.body;
 
   const user = await User.findOne({ userName });
 
-  //if (user && (await user.matchPassword(password))) {
-  if (user) {
+  if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
       userName: user.userName,
