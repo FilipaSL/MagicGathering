@@ -11,6 +11,7 @@ function UserOpsModal({
   handleUserDelete,
   handleUserEdit,
   handleViewUsersModal,
+  handleViewUserManager
 }) {
   if (!viewUsersModal) {
     return (
@@ -33,6 +34,7 @@ function UserOpsModal({
   const displayUserProps = {
     handleUserDelete,
     handleViewEditUserModal: handleUserEdit,
+    handleViewUserManager
   };
 
   const showUserList = userList.map((user, index) => {

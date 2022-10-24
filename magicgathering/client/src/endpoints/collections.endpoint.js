@@ -13,6 +13,12 @@ const collectionRequests = {
     });
     return collections;
   },
+  getAllCollectionsFromAnotherUser: (id) => {
+    const collections = sendRequest(`/collections/all/${id}`).then((data) => {
+      return data;
+    });
+    return collections;
+  },
   deleteCollection: (id) => {
     try {
       const ans = sendRequest(`/collections/delete/${id}`, "DELETE").then(

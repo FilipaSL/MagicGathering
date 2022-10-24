@@ -12,6 +12,7 @@ import collectionRequests from "../../endpoints/collections.endpoint";
 import AlertBar from "../AlertBar/AlertBar";
 import ViewMode from "./helpers/ViewMode";
 import "./FrontPage.css";
+import UserActsModal from "../Modals/UserActsModal";
 
 function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
   //User cards and collections
@@ -41,6 +42,13 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
   const [viewUsersModal, setViewUsersModal] = useState(false);
   const [viewEditUsersModal, setViewEditUsersModal] = useState(false);
   const [userEditModal, setUserToEditModal] = useState(null);
+
+  //Manage Users Modal
+  const [viewUsersManageModal, setViewUsersManageModal] = useState(false);
+  const [userManageModal, setUserToManageModal] = useState(null);
+  const [otherCollections, setOtherCollections] = useState(null);
+  const [otherCards, setOtherCards] = useState(null);
+
 
   //view alerts
   const [viewAlertBar, setViewAlertBar] = useState(false);
@@ -100,6 +108,27 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     setViewMode(value);
   };
 
+  const handleViewOtherCardsModal = (colId) => {
+    setViewCardsModal(!viewCardsModal);
+
+    if (!viewCardsModal) {
+      const nameCollection = otherCollections.find((col) => {
+        if (col && col._id === colId) {
+          return col.colName;
+        }
+        return "";
+      });
+
+      setModalColName(nameCollection.colName);
+
+      const amostra = otherCards.filter((card) => {
+        return card.collectionId === colId;
+      });
+
+      setOtherCards(amostra);
+    }
+  };
+
   const handleViewCardsModal = (colId) => {
     setViewCardsModal(!viewCardsModal);
 
@@ -154,6 +183,26 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
         });
     }
   };
+ 
+  const handleOtherCardDelete = (deletingCardId) => {
+    if (deletingCardId !== null) {
+      cardRequests
+        .deleteCard(deletingCardId)
+        .then((ans) => {
+          if (houstonWeHaveAnAlert(ans, "Card Deleted!")) {
+            return;
+          }
+
+          const cardsNiche = otherCards.filter(
+            (card) => card._id !== deletingCardId
+          );
+          setOtherCards(cardsNiche);
+        })
+        .catch((error) => {
+          houstonWeHaveAnAlert("Error Deleting Card");
+        });
+    }
+  };
 
   const handleColDelete = (deletingColId) => {
     collectionRequests
@@ -168,6 +217,24 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
         );
         setCollections(colsNiche);
         setFilteredCollections(colsNiche);
+      })
+      .catch((error) => {
+        houstonWeHaveAnAlert("Error Deleting Collection");
+      });
+  };
+
+  const handleOtherColDelete = (deletingColId) => {
+    collectionRequests
+      .deleteCollection(deletingColId)
+      .then((ans) => {
+        if (houstonWeHaveAnAlert(ans, "Collection Deleted!")) {
+          return;
+        }
+
+        const colsNiche = otherCollections.filter(
+          (col) => col._id !== deletingColId
+        );
+        setOtherCollections(colsNiche);
       })
       .catch((error) => {
         houstonWeHaveAnAlert("Error Deleting Collection");
@@ -208,6 +275,20 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     }
   };
 
+  const handleViewEditOtherCollectionModal = (id) => {
+
+    setViewEditCollectionModal(!viewEditCollectionModal);
+    if (!viewEditCollectionModal) {
+      const desiredCollection = otherCollections.find(
+        (collection) => collection._id === id
+      );
+
+      if (desiredCollection) {
+        setCollectionToEditModal(desiredCollection);
+      }
+    }
+  };
+
   const handleSaveEditCollectionModal = (name) => {
     //I am editing
     if (collectionEditModal._id) {
@@ -222,16 +303,27 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
             setViewEditCollectionModal(false);
             return;
           }
+          if(viewUsersManageModal){
+            const newOtherColList = updateArray(
+              otherCollections,
+              col.data,
+              collectionEditModal._id
+            );
+            setOtherCollections(newOtherColList);
 
-          const newColList = updateArray(
-            collections,
-            col.data,
-            collectionEditModal._id
-          );
-
-          setCollections(newColList);
-          setFilteredCollections(newColList);
+          }
+          else{
+            const newColList = updateArray(
+              collections,
+              col.data,
+              collectionEditModal._id
+            );
+  
+            setCollections(newColList);
+            setFilteredCollections(newColList);
+          }
           setViewEditCollectionModal(false);
+
         })
         .catch((error) => {
           houstonWeHaveAnAlert("Error Editing Collection");
@@ -283,17 +375,28 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
             setViewEditCardModal(false);
             return;
           }
+          if(viewUsersManageModal){
+            const newOtherCardList = updateArray(
+              otherCards,
+              received.data,
+              cardEditModal._id
+            );
+            setOtherCards(newOtherCardList);
 
-          const newCardList = updateArray(
-            cards,
-            received.data,
-            cardEditModal._id
-          );
-
-          setOfficialCards(newCardList);
-
-          setFilteredOfficialCards(newCardList);
+          }
+          else{
+            const newCardList = updateArray(
+              cards,
+              received.data,
+              cardEditModal._id
+            );
+  
+            setOfficialCards(newCardList);
+  
+            setFilteredOfficialCards(newCardList);
+          }
           setViewEditCardModal(false);
+
         })
         .catch((error) => {
           houstonWeHaveAnAlert("Error Editing Card");
@@ -347,6 +450,16 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     }
   };
 
+  const handleViewEditOthersCardModal = (id) => {
+    setViewEditCardModal(!viewEditCardModal);
+    if (!viewEditCardModal) {
+      const desiredCard = otherCards.find((card) => card._id === id);
+      if (desiredCard) {
+        setCardToEditModal(desiredCard);
+      }
+    }
+  };
+
   const handleSaveEditUsersModal = (userName, realName, admin) => {
     if (userEditModal._id) {
       const newUser = JSON.stringify({
@@ -386,6 +499,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
   const handleViewUsersModal = () => {
     setViewUsersModal(!viewUsersModal);
   };
+
   //receives cardID
   const handleChangeCardCollection = (id) => {
     setCardToCollId(id);
@@ -443,6 +557,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     }
     return "None";
   };
+
   const houstonWeHaveAnAlert = (obj, message = null) => {
     if (obj.data === null) {
       setViewAlertBar(true);
@@ -475,6 +590,29 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     return newArray;
   };
 
+  const handleViewUserManager = (user) => {
+    setViewUsersManageModal(true);
+    setUserToManageModal(user);
+    collectionRequests.getAllCollectionsFromAnotherUser(user._id)
+    .then((response)=>{
+      const col = response.data;
+      if (houstonWeHaveAnAlert(response)) {
+        return;
+      }
+  
+      setOtherCollections(col);   
+  
+      cardRequests.getUserCards(col).then((resp) => {
+        let cardData = resp.data;
+        if (houstonWeHaveAnAlert(resp)) {
+          return;
+        }
+        setOtherCards(cardData);
+      });
+    }
+    )
+  }
+
   //Props definitions
   const headerProps = {
     viewMode: handleViewMode,
@@ -503,6 +641,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     userList: users,
     handleUserEdit: handleViewEditUserModal,
     handleUserDelete,
+    handleViewUserManager
   };
 
   const editCardsModalProps = {
@@ -524,6 +663,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     handleClose: handleViewEditUserModal,
     user: userEditModal,
     handleSave: handleSaveEditUsersModal,
+    handleViewUserManager: handleViewUserManager,
     requestUser: loggedUser
   };
 
@@ -534,6 +674,26 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     handleColClick: handleUpdateCardColl,
     handleClose: setViewCollectionModal,
   };
+
+  const otherUserCardsModalProps = {
+    viewCardsModal,
+    handleViewCardsModal,
+    viewCards: otherCards,
+    handleViewEditCardModal: handleViewEditOthersCardModal,
+    handleCardDelete: handleOtherCardDelete,
+    handleChangeCardCollection,
+  };
+
+  const manageUserProps = {
+    viewModal: viewUsersManageModal,
+    collections: otherCollections,
+    user: userManageModal,
+    handleViewModal: ()=> setViewUsersManageModal(false),
+    handleViewCardsModal: handleViewOtherCardsModal,
+    handleViewEditCollectionModal: handleViewEditOtherCollectionModal,
+    handleColDelete: handleOtherColDelete,
+    otherUserCardsModalProps: otherUserCardsModalProps   
+  }
 
   const viewModeProps = {
     viewMode,
@@ -569,6 +729,9 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
       <EditUserModal {...editUsersModalProps}></EditUserModal>
 
       <CollectionsModal {...chooseNewColectionModalProps}></CollectionsModal>
+
+      <UserActsModal {...manageUserProps}></UserActsModal>
+
     </div>
   );
 }

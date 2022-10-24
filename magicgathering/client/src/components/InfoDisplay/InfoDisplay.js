@@ -5,11 +5,9 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import "./InfoDisplay.css";
 
 function InfoDisplay({
-  isCard,
   collection,
   card,
   user,
-  cardInfo,
   index,
   handleCardDelete,
   handleColDelete,
@@ -19,6 +17,7 @@ function InfoDisplay({
   handleViewEditCollectionModal,
   handleViewEditUserModal,
   handleChangeCardCollection,
+  handleViewUserManager,
   getCardCol,
 }) {
   if (card) {
@@ -134,7 +133,6 @@ function InfoDisplay({
         <Card.Body>
           <Card.Title>Username: {user.userName}</Card.Title>
           <Card.Title>Real Name: {user.realName}</Card.Title>
-          <Card.Text>Password: YOU WISH!</Card.Text>
         </Card.Body>
         <Card.Footer>
           <ButtonGroup aria-label="First group">
@@ -144,6 +142,13 @@ function InfoDisplay({
               onClick={() => handleViewEditUserModal(user._id)}
             >
               Edit
+            </Button>
+            <Button
+              size="sm"
+              variant="outline-info"
+              onClick={() => handleViewUserManager(user)}
+            >
+              C&C
             </Button>
             <Button
               size="sm"

@@ -73,8 +73,6 @@ const getAllCollectionsFromAnotherUser = async (req, res) => {
   const id = req.params.id;
   const searchId = new ObjectId(id);
 
-  //no need for verification because it only gets info from the logged user
-
   await Collection.find({ userId: searchId })
     .then((col) => {
       responseFormat.data = col;

@@ -7,7 +7,7 @@ import FormEntry from "./FormEntry.js";
 
 function EditCollectionModal({ collection, handleClose, handleSave, show }) {
   const name = useRef(collection ? collection.colName : null);
-
+  
   if (!show) {
     return (
       <AdaptativeModal

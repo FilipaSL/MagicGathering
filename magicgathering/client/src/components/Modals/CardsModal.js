@@ -31,7 +31,7 @@ function CardsModal({
     colName,
   };
 
-  if (viewCardsModal) {
+  if (viewCardsModal && viewCards) {
     cardsList = viewCards.map((card, index) => {
       let cardProps = {
         ...displayCardProps,
@@ -40,6 +40,9 @@ function CardsModal({
       };
       return <InfoDisplay key={index} {...cardProps} />;
     });
+  }
+  else{
+    cardsList = "No cards to display."
   }
 
   return (
