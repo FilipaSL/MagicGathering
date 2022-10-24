@@ -48,6 +48,10 @@ function App() {
     setLoginInfo({ username: username, password: password });
   };
 
+  const handleLoggedUserEdit=(user)=>{
+    setLoggedUser(user)
+  }
+
   const handleRegister = (username, realName, password) => {
     if (username && password && realName) {
       loginRequest
@@ -94,6 +98,7 @@ function App() {
   const userProps = {
     loggedUser,
     handleUserLogout,
+    handleLoggedUserEdit
   };
 
   const Login = (

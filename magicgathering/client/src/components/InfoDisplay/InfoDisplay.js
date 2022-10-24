@@ -9,6 +9,7 @@ function InfoDisplay({
   collection,
   card,
   user,
+  cardInfo,
   index,
   handleCardDelete,
   handleColDelete,
@@ -20,7 +21,7 @@ function InfoDisplay({
   handleChangeCardCollection,
   getCardCol,
 }) {
-  if (isCard && card) {
+  if (card) {
     return (
       <Card
         className="card"
@@ -55,24 +56,26 @@ function InfoDisplay({
               Edit
             </Button>
             {handleChangeCardCollection ? (
+              <>
               <Button
                 size="sm"
                 variant="secondary"
                 onClick={() => handleChangeCardCollection(card._id)}
-              >
+                >
                 Change Collection
               </Button>
-            ) : (
-              <></>
-            )}
+         
             <Button
               size="sm"
               variant="secondary"
               onClick={() => handleCardDelete(card._id)}
             >
               Delete
-            </Button>
-          </ButtonGroup>
+            </Button></>
+            ) : (
+              <></>
+            )}
+          </ButtonGroup>   
         </Card.Footer>
       </Card>
     );

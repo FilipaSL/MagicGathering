@@ -7,7 +7,7 @@ function AlertBar({ handleClose, message, variant }) {
   const handleCloseAlert = () => {
     handleClose(false);
   };
-  setTimeout(handleCloseAlert, 2000);
+  setTimeout(handleCloseAlert, 3000);
   return (
     <Alert
       key={variant}

@@ -5,7 +5,7 @@ const { verifyCardRequestUser, verifyIsAdmin } = require("./helpers/helpers");
 
 //Get all cards
 const getAllCards = async (req, res) => {
-  if (!verifyIsAdmin(res, req.user.admin)) {
+  if (!req.user ||!verifyIsAdmin(res, req.user.admin)) {
     return;
   }
   await Card.find()
@@ -14,6 +14,7 @@ const getAllCards = async (req, res) => {
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err;
       res.status(400).json(responseFormat);
     });
@@ -21,7 +22,7 @@ const getAllCards = async (req, res) => {
 
 //Get one card
 const getOneCard = async (req, res) => {
-  if (!verifyIsAdmin(res, req.user.admin)) {
+  if (!req.user ||!verifyIsAdmin(res, req.user.admin)) {
     return;
   }
   const id = req.params.id;
@@ -32,6 +33,7 @@ const getOneCard = async (req, res) => {
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err;
       res.status(400).json(responseFormat);
     });
@@ -40,10 +42,13 @@ const getOneCard = async (req, res) => {
 //Get collection Cards
 const getCollectionCards = async (req, res) => {
   const searchId = req.params.id;
+  if(!req.user ||!req.body){
+    return
+  }
   const allowed = await verifyCardRequestUser(req.user, searchId);
   if (!allowed) {
     responseFormat.data = null;
-    responseFormat.message = "User has permission to make this alteration.";
+    responseFormat.message = "User doesn't have permission to make this alteration.";
     res.status(400).json(responseFormat);
     return;
   }
@@ -53,6 +58,7 @@ const getCollectionCards = async (req, res) => {
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err;
       res.status(400).json(responseFormat);
     });
@@ -60,6 +66,9 @@ const getCollectionCards = async (req, res) => {
 
 //Create new Card
 const postCard = async (req, res) => {
+  if(!req.user ||!req.body){
+    return
+  }
   const allowed = await verifyCardRequestUser(req.user, req.body.collectionId);
   if (!allowed) {
     responseFormat.data = null;
@@ -75,6 +84,7 @@ const postCard = async (req, res) => {
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err.message;
       res.status(400).json(responseFormat);
     });
@@ -84,7 +94,9 @@ const postCard = async (req, res) => {
 const deleteCard = async (req, res) => {
   const id = req.params.id;
   const searchId = new ObjectId(id);
-
+  if(!req.user ||!req.body){
+    return
+  }
   await Card.deleteOne({ _id: searchId })
     .then((ans) => {
       if (ans.deletedCount === 0) {
@@ -97,6 +109,7 @@ const deleteCard = async (req, res) => {
       }
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err;
       res.status(400).json(responseFormat);
     });
@@ -104,14 +117,16 @@ const deleteCard = async (req, res) => {
 
 //Update one card
 const updateCard = async (req, res) => {
+  if(!req.user ||!req.body){
+    return
+  }
   const id = req.params.id;
   const body = req.body;
-
   const searchId = new ObjectId(id);
   const allowed = await verifyCardRequestUser(req.user, req.body.collectionId);
   if (!allowed) {
     responseFormat.data = null;
-    responseFormat.message = "User has permission to make this alteration.";
+    responseFormat.message = "User doesn't have permission to make this alteration.";
     res.status(400).json(responseFormat);
     return;
   }
@@ -128,6 +143,7 @@ const updateCard = async (req, res) => {
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err;
       res.status(400).json(responseFormat);
     });

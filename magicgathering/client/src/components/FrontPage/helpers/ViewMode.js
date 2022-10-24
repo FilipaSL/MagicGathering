@@ -19,7 +19,7 @@ const ViewMode = ({
   let collectionList;
 
   //Fill in variable with list of cards to display
-  if (filteredCards) {
+  if (filteredCards && filteredCards.length > 0) {
     cardList = filteredCards.map((card, index) => {
       let displayProps = {
         isCard: true,
@@ -33,9 +33,12 @@ const ViewMode = ({
       return <InfoDisplay key={index} {...displayProps}></InfoDisplay>;
     });
   }
+  else{
+    cardList = "None card to show."
+  }
 
   //Fill in variable with list of collections to display
-  if (filteredCollections) {
+  if (filteredCollections && filteredCollections.length > 0) {
     collectionList = filteredCollections.map((collection, index) => {
       let displayProps = {
         collection,
@@ -47,6 +50,10 @@ const ViewMode = ({
       return <InfoDisplay key={index} {...displayProps}></InfoDisplay>;
     });
   }
+  else{
+    collectionList = "None collection to show."
+  }
+
   switch (viewMode) {
     case 1:
       lists = (
@@ -72,12 +79,12 @@ const ViewMode = ({
     default:
       lists = (
         <div className="items-display">
-          <p>Your Cards</p>
+          <p className="section-title">Your Cards</p>
           <Row xs={2} md={3} className="justify-content-center">
             {cardList}
           </Row>
 
-          <p>Your Collections</p>
+          <p className="section-title">Your Collections</p>
           <Row xs={2} md={3} className="justify-content-center">
             {collectionList}
           </Row>

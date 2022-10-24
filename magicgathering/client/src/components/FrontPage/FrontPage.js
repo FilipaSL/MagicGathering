@@ -13,7 +13,7 @@ import AlertBar from "../AlertBar/AlertBar";
 import ViewMode from "./helpers/ViewMode";
 import "./FrontPage.css";
 
-function FrontPage({ loggedUser, handleUserLogout }) {
+function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
   //User cards and collections
   const [collections, setCollections] = useState(null);
   const [cards, setOfficialCards] = useState(null);
@@ -57,7 +57,7 @@ function FrontPage({ loggedUser, handleUserLogout }) {
   useEffect(() => {
     collectionRequests.getAllCollectionsFromUser().then((response) => {
       const col = response.data;
-      if (houstonWeHaveAnAlert(response)) {
+      if (houstonWeHaveAnAlert(response, "Could not get all collections from user")) {
         return;
       }
 
@@ -80,7 +80,7 @@ function FrontPage({ loggedUser, handleUserLogout }) {
     if (loggedUser.admin) {
       userRequests.getAllUsers().then((data) => {
         const usersData = data.data;
-        if (houstonWeHaveAnAlert(data)) {
+        if (houstonWeHaveAnAlert(data, "Coould not get user list")) {
           return;
         }
 
@@ -150,7 +150,7 @@ function FrontPage({ loggedUser, handleUserLogout }) {
           setFilteredOfficialCards(cardsNiche);
         })
         .catch((error) => {
-          houstonWeHaveAnAlert("Error Deleting Card: " + error);
+          houstonWeHaveAnAlert("Error Deleting Card");
         });
     }
   };
@@ -170,7 +170,7 @@ function FrontPage({ loggedUser, handleUserLogout }) {
         setFilteredCollections(colsNiche);
       })
       .catch((error) => {
-        houstonWeHaveAnAlert("Error Deleting Collection: " + error);
+        houstonWeHaveAnAlert("Error Deleting Collection");
       });
   };
 
@@ -187,7 +187,7 @@ function FrontPage({ loggedUser, handleUserLogout }) {
         setUsers(userNiche);
       })
       .catch((error) => {
-        houstonWeHaveAnAlert("Error Deleting User: " + error);
+        houstonWeHaveAnAlert("Error Deleting User");
       });
   };
 
@@ -219,6 +219,7 @@ function FrontPage({ loggedUser, handleUserLogout }) {
         .updateCollection(collectionEditModal._id, newCollection)
         .then((col) => {
           if (houstonWeHaveAnAlert(col, "Collection Updated!")) {
+            setViewEditCollectionModal(false);
             return;
           }
 
@@ -233,7 +234,8 @@ function FrontPage({ loggedUser, handleUserLogout }) {
           setViewEditCollectionModal(false);
         })
         .catch((error) => {
-          houstonWeHaveAnAlert("Error Editing Collection: " + error);
+          houstonWeHaveAnAlert("Error Editing Collection");
+          setViewEditCollectionModal(false);
         });
     }
     //I am creating
@@ -246,6 +248,7 @@ function FrontPage({ loggedUser, handleUserLogout }) {
         .createCollection(newCollection)
         .then((newColl) => {
           if (houstonWeHaveAnAlert(newColl, "Collection Created!")) {
+            setViewEditCollectionModal(false);
             return;
           }
 
@@ -257,7 +260,8 @@ function FrontPage({ loggedUser, handleUserLogout }) {
           setViewEditCollectionModal(false);
         })
         .catch((error) => {
-          houstonWeHaveAnAlert("Error Creating Collection: " + error);
+          houstonWeHaveAnAlert("Error Creating Collection");
+          setViewEditCollectionModal(false);
         });
     }
   };
@@ -269,12 +273,14 @@ function FrontPage({ loggedUser, handleUserLogout }) {
         cardName: name.value,
         value: valor.value,
         description: description.value,
+        collectionId: cardEditModal.collectionId
       });
 
       cardRequests
         .updateCard(cardEditModal._id, newCard)
         .then((received) => {
           if (houstonWeHaveAnAlert(received, "Card Edited!")) {
+            setViewEditCardModal(false);
             return;
           }
 
@@ -290,7 +296,9 @@ function FrontPage({ loggedUser, handleUserLogout }) {
           setViewEditCardModal(false);
         })
         .catch((error) => {
-          houstonWeHaveAnAlert("Error Editing Card: " + error);
+          houstonWeHaveAnAlert("Error Editing Card");
+          setViewEditCardModal(false);
+
         });
     }
     //I am creating
@@ -305,6 +313,7 @@ function FrontPage({ loggedUser, handleUserLogout }) {
         .createCard(newCard)
         .then((createdCard) => {
           if (houstonWeHaveAnAlert(createdCard, "Card Created!")) {
+            setViewEditCardModal(false);
             return;
           }
           const clone = cards;
@@ -315,7 +324,8 @@ function FrontPage({ loggedUser, handleUserLogout }) {
           setViewEditCardModal(false);
         })
         .catch((error) => {
-          houstonWeHaveAnAlert("Error Creating Card: " + error);
+          houstonWeHaveAnAlert("Error Creating Card");
+          setViewEditCardModal(false);
         });
     }
   };
@@ -349,6 +359,7 @@ function FrontPage({ loggedUser, handleUserLogout }) {
         .updateUser(userEditModal._id, newUser)
         .then((received) => {
           if (houstonWeHaveAnAlert(received, "User Edited!")) {
+            setViewEditUsersModal(false);
             return;
           }
 
@@ -360,9 +371,14 @@ function FrontPage({ loggedUser, handleUserLogout }) {
 
           setUsers(newUserList);
           setViewEditUsersModal(false);
+          if(userEditModal._id === loggedUser._id){
+            handleLoggedUserEdit(received.data)
+          }
         })
         .catch((error) => {
-          houstonWeHaveAnAlert("Error Editing User: " + error);
+          houstonWeHaveAnAlert("Error Editing User");
+          setViewEditUsersModal(false);
+
         });
     }
   };
@@ -385,6 +401,7 @@ function FrontPage({ loggedUser, handleUserLogout }) {
       .updateCard(cardToCollectionID, newCard)
       .then((received) => {
         if (houstonWeHaveAnAlert(received, "Card Collection Changed!")) {
+          setViewCollectionModal(false);
           return;
         }
 
@@ -399,7 +416,9 @@ function FrontPage({ loggedUser, handleUserLogout }) {
         setViewCollectionModal(false);
       })
       .catch((error) => {
-        houstonWeHaveAnAlert("Error Editing Card: " + error);
+        houstonWeHaveAnAlert("Error Updating Card Collection");
+        setViewCollectionModal(false);
+
       });
     setViewCollectionModal(false);
   };
@@ -427,10 +446,11 @@ function FrontPage({ loggedUser, handleUserLogout }) {
   const houstonWeHaveAnAlert = (obj, message = null) => {
     if (obj.data === null) {
       setViewAlertBar(true);
+      const isString = typeof(obj.message) === "string";
       console.log("Houston we had an error");
       setAlertBarProps({
         handleClose: () => setViewAlertBar(false),
-        message: obj.message,
+        message: isString ? obj.message: obj.message.message,
         variant: "danger",
       });
       return true;

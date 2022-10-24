@@ -6,6 +6,7 @@
   text-align: center;
   background-color: #282c34;
   overflow-x: hidden;
+  height: 100vh;
 }
 
 .appHeader {

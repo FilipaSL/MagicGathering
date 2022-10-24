@@ -5,7 +5,7 @@ const { verifyIsAdmin } = require("./helpers/helpers");
 
 //Get all users
 const getAllUsers = async (req, res) => {
-  if (!verifyIsAdmin(res, req.user.admin)) {
+  if (!req.user ||!verifyIsAdmin(res, req.user.admin)) {
     return;
   }
   await User.find()
@@ -22,7 +22,7 @@ const getAllUsers = async (req, res) => {
 
 //Create a new User
 const postUser = (req, res) => {
-  if (!verifyIsAdmin(res, req.user.admin)) {
+  if (!req.user || !verifyIsAdmin(res, req.user.admin)) {
     return;
   }
   const newUser = new User(req.body);
@@ -42,7 +42,7 @@ const postUser = (req, res) => {
 
 //Delete one User
 const deleteUser = async (req, res) => {
-  if (!verifyIsAdmin(res, req.user.admin)) {
+  if (!req.user ||!verifyIsAdmin(res, req.user.admin)) {
     return;
   }
   const id = req.params.id;
@@ -62,7 +62,7 @@ const deleteUser = async (req, res) => {
 
 //Update one User
 const updateUser = async (req, res) => {
-  if (!verifyIsAdmin(res, req.user.admin)) {
+  if (!req.user ||!verifyIsAdmin(res, req.user.admin)) {
     return;
   }
   const id = req.params.id;
@@ -73,6 +73,7 @@ const updateUser = async (req, res) => {
       responseFormat.data = newUser;
 
       if (!newUser) {
+        responseFormat.data = null;
         responseFormat.message = "User not found";
         res.status(400).json(responseFormat);
       }

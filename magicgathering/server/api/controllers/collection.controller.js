@@ -5,7 +5,7 @@ const { verifyIsAdmin, collectionFilter } = require("./helpers/helpers");
 
 //Get all collections
 const getAllCollections = async (req, res) => {
-  if (!verifyIsAdmin(res, req.user.admin)) {
+  if (!req.user ||!verifyIsAdmin(res, req.user.admin)) {
     return;
   }
   await Collection.find()
@@ -14,6 +14,7 @@ const getAllCollections = async (req, res) => {
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err;
       res.status(400).json(responseFormat);
     });
@@ -21,6 +22,9 @@ const getAllCollections = async (req, res) => {
 
 //Get one unnoficial collection
 const getUnCollection = async (req, res) => {
+  if(!req.user ||!req.body){
+    return
+  }
   const id = req.user.id;
   const searchId = new ObjectId(id);
   //no need for verification because it only gets info from the logged user
@@ -31,6 +35,7 @@ const getUnCollection = async (req, res) => {
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err;
       res.status(400).json(responseFormat);
     });
@@ -38,6 +43,9 @@ const getUnCollection = async (req, res) => {
 
 //All user collections
 const getAllUserCollections = async (req, res) => {
+  if(!req.user ||!req.body){
+    return
+  }
   const id = req.user.id;
   const searchId = new ObjectId(id);
 
@@ -49,6 +57,7 @@ const getAllUserCollections = async (req, res) => {
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err;
       res.status(400).json(responseFormat);
     });
@@ -68,6 +77,7 @@ const postCollection = (req, res) => {
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err.message;
       res.status(400).json(responseFormat);
     });
@@ -77,6 +87,9 @@ const postCollection = (req, res) => {
 const deleteCollection = async (req, res) => {
   const id = req.params.id;
   const searchId = new ObjectId(id);
+  if(!req.user ||!req.body){
+    return
+  }
   const filter = collectionFilter(searchId, req.user);
 
   await Collection.deleteOne(filter)
@@ -85,6 +98,7 @@ const deleteCollection = async (req, res) => {
       res.status(200).json(responseFormat);
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err;
       res.status(400).json(responseFormat);
     });
@@ -93,6 +107,9 @@ const deleteCollection = async (req, res) => {
 //Update one collection
 const updateCollection = async (req, res) => {
   const id = req.params.id;
+  if(!req.user ||!req.body){
+    return
+  }
   const body = req.body;
   const searchId = new ObjectId(id);
   const filter = collectionFilter(searchId, req.user);
@@ -101,6 +118,7 @@ const updateCollection = async (req, res) => {
       responseFormat.data = resp;
 
       if (!resp) {
+        responseFormat.data = null;
         responseFormat.message = "Collection not found.";
         res.status(404).json(responseFormat);
       } else {
@@ -108,6 +126,7 @@ const updateCollection = async (req, res) => {
       }
     })
     .catch((err) => {
+      responseFormat.data = null;
       responseFormat.message = err;
       res.status(400).json(responseFormat);
     });

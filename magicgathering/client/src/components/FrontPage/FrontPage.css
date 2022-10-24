@@ -14,6 +14,11 @@
   background-color: #282c34;
 }
 
+.section-title{
+  color: #ffd8d8;
+  margin-top: revert;
+}
+
 .items-display-minimum {
   width: 100vw;
   height: 100vh;
@@ -24,4 +29,5 @@
 
 .header {
   width: 98vw;
+  margin: auto;
 }
