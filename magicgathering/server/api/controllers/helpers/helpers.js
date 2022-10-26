@@ -47,22 +47,31 @@ const collectionFilter = (searchId, user) => {
   return filter;
 };
 
-const userPassResponseFilter= (userData)=>{
-  if (userData.password){
+const userPassResponseFilter = (userData) => {
+  if (userData.password) {
     return {
       _id: userData._id,
-      userName : userData.userName,
+      userName: userData.userName,
       realName: userData.realName,
-      admin: userData.admin
-    }
+      admin: userData.admin,
+    };
   }
-  return userData
-}
+  return userData;
+};
+
+const verifyCardBodyValues = (body) => {
+  if (!body.value || body.description === "" || body.cardName === "") {
+    return false;
+  }
+
+  return true;
+};
 
 module.exports = {
   verifyIsAdmin,
   verifyCardRequestUser,
   verifyCollRequestUser,
   collectionFilter,
-  userPassResponseFilter
+  userPassResponseFilter,
+  verifyCardBodyValues,
 };

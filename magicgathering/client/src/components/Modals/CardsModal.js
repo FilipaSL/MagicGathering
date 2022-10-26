@@ -12,6 +12,7 @@ function CardsModal({
   colName,
   handleCardDelete,
   handleViewEditCardModal,
+  modalError,
 }) {
   const modalTitle = "Collection " + colName + " Cards";
   const footer = false;
@@ -22,6 +23,7 @@ function CardsModal({
     footer,
     handleClose: handleViewCardsModal,
     show: viewCardsModal,
+    modalError,
   };
 
   const displayCardProps = {
@@ -40,9 +42,8 @@ function CardsModal({
       };
       return <InfoDisplay key={index} {...cardProps} />;
     });
-  }
-  else{
-    cardsList = "No cards to display."
+  } else {
+    cardsList = "No cards to display.";
   }
 
   return (

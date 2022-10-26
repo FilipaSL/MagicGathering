@@ -1,11 +1,12 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Form } from "react-bootstrap";
 
 function AdaptativeModal({
   handleClose,
   handleSave,
+  error,
   show,
   modalTitle,
   footer,
@@ -29,7 +30,16 @@ function AdaptativeModal({
       <Modal.Header closeButton>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>{children}</Modal.Body>
+      <Modal.Body>
+        {error ? (
+          <Form.Group className="mb-3" controlId="errorMessage">
+            <Form.Text className="text-muted">{error}</Form.Text>
+          </Form.Group>
+        ) : (
+          <></>
+        )}
+        {children}
+      </Modal.Body>
       {footer}
     </Modal>
   );

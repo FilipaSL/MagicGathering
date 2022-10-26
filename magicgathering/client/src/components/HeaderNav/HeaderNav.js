@@ -35,48 +35,30 @@ function HeaderNav({
   return (
     <Navbar className="header" bg="light" expand="md" variant="light">
       <Container fluid>
-        <Navbar.Brand href="#home">Main Menu</Navbar.Brand>
+        <Navbar.Brand>Main Menu</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <NavDropdown title="View Options" id="basic-nav-dropdown">
-              <NavDropdown.Item
-                href="#action/3.1"
-                onClick={() => handleView(1)}
-              >
+              <NavDropdown.Item onClick={() => handleView(1)}>
                 Cards
               </NavDropdown.Item>
-              <NavDropdown.Item
-                href="#action/3.2"
-                onClick={() => handleView(2)}
-              >
+              <NavDropdown.Item onClick={() => handleView(2)}>
                 Collections
               </NavDropdown.Item>
-              <NavDropdown.Item
-                href="#action/3.3"
-                onClick={() => handleView(3)}
-              >
+              <NavDropdown.Item onClick={() => handleView(3)}>
                 Both
               </NavDropdown.Item>
             </NavDropdown>
             <NavDropdown title="Operations" id="basic-nav-dropdown">
-              <NavDropdown.Item
-                href="#action/3.1"
-                onClick={() => editCardModal()}
-              >
+              <NavDropdown.Item onClick={() => editCardModal()}>
                 Add Card
               </NavDropdown.Item>
-              <NavDropdown.Item
-                href="#action/3.2"
-                onClick={() => editColModal()}
-              >
+              <NavDropdown.Item onClick={() => editColModal()}>
                 Add Collection
               </NavDropdown.Item>
-              {loggedUser.admin ? (
-                <NavDropdown.Item
-                  href="#action/3.3"
-                  onClick={() => userModal()}
-                >
+              {loggedUser?.admin ? (
+                <NavDropdown.Item onClick={() => userModal()}>
                   Manage Users
                 </NavDropdown.Item>
               ) : (
@@ -108,15 +90,13 @@ function HeaderNav({
         <Navbar.Collapse className="justify-content-end">
           <Navbar.Text>
             Signed in as:{" "}
-            <a href="#login" onClick={() => editUserModal(loggedUser._id)}>
-              {loggedUser.realName}
+            <a onClick={() => editUserModal(loggedUser?._id)}>
+              {loggedUser?.realName}
             </a>
           </Navbar.Text>
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
-          <Nav.Link href="#action" onClick={() => handleLogout()}>
-            Logout
-          </Nav.Link>
+          <Nav.Link onClick={() => handleLogout()}>Logout</Nav.Link>
         </Navbar.Collapse>
       </Container>
     </Navbar>

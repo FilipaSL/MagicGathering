@@ -3,7 +3,7 @@ import Alert from "react-bootstrap/Alert";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-function AlertBar({ handleClose, message, variant }) {
+function AlertBar({ handleClose, message, variant = "danger" }) {
   const handleCloseAlert = () => {
     handleClose(false);
   };

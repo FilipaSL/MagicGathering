@@ -33,7 +33,7 @@ const collectionRequests = {
   },
   updateCollection: (id, body) => {
     try {
-      const ans = sendRequest(`/collections/update/${id}`, "PUT", body).then(
+      const ans = sendRequest(`/collections/update/${id}`, "PATCH", body).then(
         (data) => {
           return data;
         }

@@ -39,7 +39,7 @@ const cardsRequest = {
   },
   updateCard: (id, body) => {
     try {
-      const ans = sendRequest(`/cards/update/${id}`, "PUT", body).then(
+      const ans = sendRequest(`/cards/update/${id}`, "PATCH", body).then(
         (data) => {
           return data;
         }

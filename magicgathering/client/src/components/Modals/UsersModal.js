@@ -11,7 +11,8 @@ function UserOpsModal({
   handleUserDelete,
   handleUserEdit,
   handleViewUsersModal,
-  handleViewUserManager
+  handleViewUserManager,
+  modalError,
 }) {
   if (!viewUsersModal) {
     return (
@@ -29,12 +30,13 @@ function UserOpsModal({
     footer,
     handleClose: handleViewUsersModal,
     show: viewUsersModal,
+    modalError,
   };
 
   const displayUserProps = {
     handleUserDelete,
     handleViewEditUserModal: handleUserEdit,
-    handleViewUserManager
+    handleViewUserManager,
   };
 
   const showUserList = userList.map((user, index) => {

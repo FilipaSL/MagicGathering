@@ -34,7 +34,7 @@ const registerUser = async (req, res) => {
   if (userExists) {
     responseFormat.data = null;
     responseFormat.message = "User already exists";
-    res.status(404).json(responseFormat);
+    res.status(400).json(responseFormat);
   } else {
     const user = await User.create({
       userName,

@@ -6,6 +6,6 @@ const router = require("express").Router();
 router.route("/").get(authM.protect, userRoutes.getAllUsers);
 router.route("/new").post(authM.protect, userRoutes.postUser);
 router.route("/delete/:id").delete(authM.protect, userRoutes.deleteUser);
-router.route("/update/:id").put(authM.protect, userRoutes.updateUser);
+router.route("/update/:id").patch(authM.protect, userRoutes.updateUser);
 
 module.exports = router;

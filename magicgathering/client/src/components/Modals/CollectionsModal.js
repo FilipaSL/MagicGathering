@@ -11,6 +11,7 @@ function CollectionsModal({
   show,
   handleColClick,
   handleClose,
+  modalError,
 }) {
   const modalTitle = "Choose one from the following collections";
   const footer = false;
@@ -20,6 +21,7 @@ function CollectionsModal({
     footer,
     handleClose,
     show,
+    modalError,
   };
   let collectionList = [];
 

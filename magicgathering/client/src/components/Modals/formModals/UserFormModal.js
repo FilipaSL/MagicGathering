@@ -3,9 +3,18 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import AdaptativeModal from "../AdaptativeModal.js";
 import Form from "react-bootstrap/Form";
-import FormEntry from "./FormEntry.js";
+import FormEntry from "../../FormEntry/FormEntry.js";
+import AlertBar from "../../AlertBar/AlertBar.js";
 
-function EditUserModal({ user, handleClose, handleSave, show, requestUser}) {
+function EditUserModal({
+  user,
+  handleClose,
+  handleSave,
+  show,
+  requestUser,
+  modalError,
+  handleCloseError,
+}) {
   const username = useRef(user ? user.userName : null);
   const realName = useRef(user ? user.realName : null);
   const admin = useRef(user ? user.admin : null);
@@ -33,8 +42,14 @@ function EditUserModal({ user, handleClose, handleSave, show, requestUser}) {
     show: show,
   };
 
+  const alertProps = {
+    message: modalError,
+    handleClose: handleCloseError,
+  };
+
   return (
     <AdaptativeModal {...modalProps}>
+      <AlertBar {...alertProps}></AlertBar>
       <Form noValidate>
         <FormEntry defValue={user.userName} label="Username" refer={username} />
         <FormEntry

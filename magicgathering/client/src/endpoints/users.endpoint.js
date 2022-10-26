@@ -15,7 +15,7 @@ const userRequests = {
   },
   updateUser: (id, body) => {
     try {
-      const ans = sendRequest(`/users/update/${id}`, "PUT", body).then(
+      const ans = sendRequest(`/users/update/${id}`, "PATCH", body).then(
         (data) => {
           return data;
         }

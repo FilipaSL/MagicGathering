@@ -66,7 +66,7 @@ const deleteUser = async (req, res) => {
     .catch((err) => {
       responseFormat.data = null;
       responseFormat.message = err;
-      res.status(400).json(responseFormat);
+      res.status(404).json(responseFormat);
     });
   
 };

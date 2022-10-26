@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+
 import CardsModal from "../Modals/CardsModal";
 import EditCardModal from "../Modals/formModals/CardFormModal";
 import EditColModal from "../Modals/formModals/ColFormModal";
@@ -14,7 +16,15 @@ import ViewMode from "./helpers/ViewMode";
 import "./FrontPage.css";
 import UserActsModal from "../Modals/UserActsModal";
 
-function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
+function FrontPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  let loggedUser = location.state;
+
+  if (!loggedUser || !Object.keys(loggedUser).length) {
+    navigate("/", { replace: true, state: { defaultUser: null } });
+  }
   //User cards and collections
   const [collections, setCollections] = useState(null);
   const [cards, setOfficialCards] = useState(null);
@@ -49,10 +59,12 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
   const [otherCollections, setOtherCollections] = useState(null);
   const [otherCards, setOtherCards] = useState(null);
 
-
   //view alerts
   const [viewAlertBar, setViewAlertBar] = useState(false);
   const [alertBarProps, setAlertBarProps] = useState(null);
+
+  //view Modal Alerts
+  const [modalError, setModalError] = useState(null);
 
   //Choose card collection
   const [viewCollectionModal, setViewCollectionModal] = useState(false);
@@ -85,7 +97,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
       });
     });
 
-    if (loggedUser.admin) {
+    if (loggedUser?.admin) {
       userRequests.getAllUsers().then((data) => {
         const usersData = data.data;
         if (houstonWeHaveAnAlert(data)) {
@@ -93,7 +105,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
         }
 
         const allUsers = usersData.filter(
-          (user) => user._id !== loggedUser._id
+          (user) => user._id !== loggedUser?._id
         );
         setUsers(allUsers);
       });
@@ -103,7 +115,9 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
   }, [loggedUser]);
 
   //Handle Functions
-
+  const handleUserLogout = () => {
+    navigate("/", { replace: true, state: { defaultUser: null } });
+  };
   const handleViewMode = (value) => {
     setViewMode(value);
   };
@@ -183,7 +197,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
         });
     }
   };
- 
+
   const handleOtherCardDelete = (deletingCardId) => {
     if (deletingCardId !== null) {
       cardRequests
@@ -276,7 +290,6 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
   };
 
   const handleViewEditOtherCollectionModal = (id) => {
-
     setViewEditCollectionModal(!viewEditCollectionModal);
     if (!viewEditCollectionModal) {
       const desiredCollection = otherCollections.find(
@@ -303,31 +316,27 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
             setViewEditCollectionModal(false);
             return;
           }
-          if(viewUsersManageModal){
+          if (viewUsersManageModal) {
             const newOtherColList = updateArray(
               otherCollections,
               col.data,
               collectionEditModal._id
             );
             setOtherCollections(newOtherColList);
-
-          }
-          else{
+          } else {
             const newColList = updateArray(
               collections,
               col.data,
               collectionEditModal._id
             );
-  
+
             setCollections(newColList);
             setFilteredCollections(newColList);
           }
           setViewEditCollectionModal(false);
-
         })
         .catch((error) => {
-          houstonWeHaveAnAlert("Error Editing Collection");
-          setViewEditCollectionModal(false);
+          houstonWeHaveAnAlert("Error Editing Collection", true);
         });
     }
     //I am creating
@@ -352,8 +361,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
           setViewEditCollectionModal(false);
         })
         .catch((error) => {
-          houstonWeHaveAnAlert("Error Creating Collection");
-          setViewEditCollectionModal(false);
+          houstonWeHaveAnAlert("Error Creating Collection", true);
         });
     }
   };
@@ -365,43 +373,41 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
         cardName: name.value,
         value: valor.value,
         description: description.value,
-        collectionId: cardEditModal.collectionId
+        collectionId: cardEditModal.collectionId,
       });
 
       cardRequests
         .updateCard(cardEditModal._id, newCard)
         .then((received) => {
           if (houstonWeHaveAnAlert(received, "Card Edited!")) {
-            setViewEditCardModal(false);
+            setModalError("Incorrect values.");
+            //setViewEditCardModal(false);
             return;
           }
-          if(viewUsersManageModal){
+          if (viewUsersManageModal) {
             const newOtherCardList = updateArray(
               otherCards,
               received.data,
               cardEditModal._id
             );
             setOtherCards(newOtherCardList);
-
-          }
-          else{
+          } else {
             const newCardList = updateArray(
               cards,
               received.data,
               cardEditModal._id
             );
-  
-            setOfficialCards(newCardList);
-  
-            setFilteredOfficialCards(newCardList);
-          }
-          setViewEditCardModal(false);
 
+            setOfficialCards(newCardList);
+
+            setFilteredOfficialCards(newCardList);
+            setViewEditCardModal(false);
+          }
         })
         .catch((error) => {
-          houstonWeHaveAnAlert("Error Editing Card");
-          setViewEditCardModal(false);
+          setModalError("Incorrect values.");
 
+          houstonWeHaveAnAlert("Error Editing Card", true);
         });
     }
     //I am creating
@@ -416,7 +422,9 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
         .createCard(newCard)
         .then((createdCard) => {
           if (houstonWeHaveAnAlert(createdCard, "Card Created!")) {
-            setViewEditCardModal(false);
+            setModalError("Incorrect values.");
+
+            //setViewEditCardModal(false);
             return;
           }
           const clone = cards;
@@ -427,13 +435,15 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
           setViewEditCardModal(false);
         })
         .catch((error) => {
-          houstonWeHaveAnAlert("Error Creating Card");
-          setViewEditCardModal(false);
+          setModalError("Incorrect values.");
+
+          houstonWeHaveAnAlert("Error Creating Card", true);
         });
     }
   };
 
   const handleViewEditCardModal = (id) => {
+    console.log(id);
     if (!id) {
       setCardToEditModal({
         cardName: "",
@@ -465,14 +475,16 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
       const newUser = JSON.stringify({
         userName: userName.value,
         realName: realName.value,
-        admin: loggedUser.admin === 1 ? admin.value : userEditModal.admin,
+        admin: loggedUser?.admin === 1 ? admin.value : userEditModal.admin,
       });
 
       userRequests
         .updateUser(userEditModal._id, newUser)
         .then((received) => {
           if (houstonWeHaveAnAlert(received, "User Edited!")) {
-            setViewEditUsersModal(false);
+            setModalError("Incorrect values.");
+
+            //setViewEditUsersModal(false);
             return;
           }
 
@@ -484,14 +496,15 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
 
           setUsers(newUserList);
           setViewEditUsersModal(false);
-          if(userEditModal._id === loggedUser._id){
-            handleLoggedUserEdit(received.data)
+          if (userEditModal._id === loggedUser?._id) {
+            loggedUser = received.data;
+            // handleloggedUser?Edit(received.data);
           }
         })
         .catch((error) => {
-          houstonWeHaveAnAlert("Error Editing User");
-          setViewEditUsersModal(false);
+          setModalError("Incorrect values.");
 
+          houstonWeHaveAnAlert("Error Editing User", true);
         });
     }
   };
@@ -515,7 +528,9 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
       .updateCard(cardToCollectionID, newCard)
       .then((received) => {
         if (houstonWeHaveAnAlert(received, "Card Collection Changed!")) {
-          setViewCollectionModal(false);
+          setModalError("Incorrect values.");
+
+          //setViewCollectionModal(false);
           return;
         }
 
@@ -530,9 +545,10 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
         setViewCollectionModal(false);
       })
       .catch((error) => {
-        houstonWeHaveAnAlert("Error Updating Card Collection");
-        setViewCollectionModal(false);
+        setModalError("Incorrect values.");
 
+        houstonWeHaveAnAlert("Error Updating Card Collection");
+        //setViewCollectionModal(false);
       });
     setViewCollectionModal(false);
   };
@@ -560,14 +576,20 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
 
   const houstonWeHaveAnAlert = (obj, message = null) => {
     if (obj.data === null) {
-      setViewAlertBar(true);
-      const isString = typeof(obj.message) === "string";
       console.log("Houston we had an error");
+
+      setViewAlertBar(true);
+      const isString = typeof obj.message === "string";
+      let msgText =
+        obj.message.includes("type") || obj.message.includes("validation")
+          ? "Error with input values"
+          : obj.message;
       setAlertBarProps({
         handleClose: () => setViewAlertBar(false),
-        message: isString ? obj.message: obj.message.message,
+        message: isString ? msgText : "Error reading inserted values",
         variant: "danger",
       });
+
       return true;
     } else if (message) {
       setViewAlertBar(true);
@@ -577,6 +599,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
         variant: "success",
       });
     }
+
     return false;
   };
 
@@ -593,25 +616,29 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
   const handleViewUserManager = (user) => {
     setViewUsersManageModal(true);
     setUserToManageModal(user);
-    collectionRequests.getAllCollectionsFromAnotherUser(user._id)
-    .then((response)=>{
-      const col = response.data;
-      if (houstonWeHaveAnAlert(response)) {
-        return;
-      }
-  
-      setOtherCollections(col);   
-  
-      cardRequests.getUserCards(col).then((resp) => {
-        let cardData = resp.data;
-        if (houstonWeHaveAnAlert(resp)) {
+    collectionRequests
+      .getAllCollectionsFromAnotherUser(user._id)
+      .then((response) => {
+        const col = response.data;
+        if (houstonWeHaveAnAlert(response)) {
           return;
         }
-        setOtherCards(cardData);
+
+        setOtherCollections(col);
+
+        cardRequests.getUserCards(col).then((resp) => {
+          let cardData = resp.data;
+          if (houstonWeHaveAnAlert(resp)) {
+            return;
+          }
+          setOtherCards(cardData);
+        });
       });
-    }
-    )
-  }
+  };
+
+  const handleCloseError = () => {
+    setModalError(null);
+  };
 
   //Props definitions
   const headerProps = {
@@ -633,6 +660,7 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     handleViewEditCardModal,
     handleCardDelete,
     handleChangeCardCollection,
+    modalError,
   };
 
   const usersModalProps = {
@@ -641,7 +669,8 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     userList: users,
     handleUserEdit: handleViewEditUserModal,
     handleUserDelete,
-    handleViewUserManager
+    handleViewUserManager,
+    modalError,
   };
 
   const editCardsModalProps = {
@@ -649,6 +678,8 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     handleClose: handleViewEditCardModal,
     card: cardEditModal,
     handleSave: handleSaveEditCardModal,
+    modalError,
+    handleCloseError,
   };
 
   const editCollectionsModalProps = {
@@ -656,6 +687,8 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     handleClose: handleViewEditCollectionModal,
     collection: collectionEditModal,
     handleSave: handleSaveEditCollectionModal,
+    modalError,
+    handleCloseError,
   };
 
   const editUsersModalProps = {
@@ -664,7 +697,9 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     user: userEditModal,
     handleSave: handleSaveEditUsersModal,
     handleViewUserManager: handleViewUserManager,
-    requestUser: loggedUser
+    requestUser: loggedUser,
+    modalError,
+    handleCloseError,
   };
 
   const chooseNewColectionModalProps = {
@@ -688,12 +723,12 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
     viewModal: viewUsersManageModal,
     collections: otherCollections,
     user: userManageModal,
-    handleViewModal: ()=> setViewUsersManageModal(false),
+    handleViewModal: () => setViewUsersManageModal(false),
     handleViewCardsModal: handleViewOtherCardsModal,
     handleViewEditCollectionModal: handleViewEditOtherCollectionModal,
     handleColDelete: handleOtherColDelete,
-    otherUserCardsModalProps: otherUserCardsModalProps   
-  }
+    otherUserCardsModalProps: otherUserCardsModalProps,
+  };
 
   const viewModeProps = {
     viewMode,
@@ -709,29 +744,31 @@ function FrontPage({ loggedUser, handleUserLogout, handleLoggedUserEdit }) {
   };
 
   return (
-    <div className="FrontPage">
-      <div className="header">
-        <HeaderNav {...headerProps} style={{ width: "100%" }}></HeaderNav>
+    <div className="App" href="/start">
+      <p className="appHeader">Magic Gathering Guide</p>
+      <div className="FrontPage">
+        <div className="header">
+          <HeaderNav {...headerProps} style={{ width: "100%" }}></HeaderNav>
+        </div>
+        {viewAlertBar ? <AlertBar {...alertBarProps}></AlertBar> : <></>}
+
+        <div className="body">
+          <ViewMode {...viewModeProps} />
+        </div>
+        <CardsModal {...cardsModalProps}></CardsModal>
+
+        <EditCardModal {...editCardsModalProps}></EditCardModal>
+
+        <EditColModal {...editCollectionsModalProps}></EditColModal>
+
+        <UserOpsModal {...usersModalProps}></UserOpsModal>
+
+        <EditUserModal {...editUsersModalProps}></EditUserModal>
+
+        <CollectionsModal {...chooseNewColectionModalProps}></CollectionsModal>
+
+        <UserActsModal {...manageUserProps}></UserActsModal>
       </div>
-      {viewAlertBar ? <AlertBar {...alertBarProps}></AlertBar> : <></>}
-
-      <div className="body">
-        <ViewMode {...viewModeProps} />
-      </div>
-      <CardsModal {...cardsModalProps}></CardsModal>
-
-      <EditCardModal {...editCardsModalProps}></EditCardModal>
-
-      <EditColModal {...editCollectionsModalProps}></EditColModal>
-
-      <UserOpsModal {...usersModalProps}></UserOpsModal>
-
-      <EditUserModal {...editUsersModalProps}></EditUserModal>
-
-      <CollectionsModal {...chooseNewColectionModalProps}></CollectionsModal>
-
-      <UserActsModal {...manageUserProps}></UserActsModal>
-
     </div>
   );
 }

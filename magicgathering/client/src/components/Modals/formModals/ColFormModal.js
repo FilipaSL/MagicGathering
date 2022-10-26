@@ -3,11 +3,19 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import AdaptativeModal from "../AdaptativeModal.js";
 import Form from "react-bootstrap/Form";
-import FormEntry from "./FormEntry.js";
+import FormEntry from "../../FormEntry/FormEntry.js";
+import AlertBar from "../../AlertBar/AlertBar.js";
 
-function EditCollectionModal({ collection, handleClose, handleSave, show }) {
+function EditCollectionModal({
+  collection,
+  handleClose,
+  handleSave,
+  show,
+  modalError,
+  handleCloseError,
+}) {
   const name = useRef(collection ? collection.colName : null);
-  
+
   if (!show) {
     return (
       <AdaptativeModal
@@ -33,8 +41,15 @@ function EditCollectionModal({ collection, handleClose, handleSave, show }) {
     show: show,
   };
 
+  const alertProps = {
+    message: modalError,
+    handleClose: handleCloseError,
+  };
+
   return (
     <AdaptativeModal {...modalProps}>
+      {modalError ? <AlertBar {...alertProps} /> : <></>}
+
       <Form noValidate>
         <FormEntry
           defValue={collection.colName}

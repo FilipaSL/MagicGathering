@@ -6,24 +6,22 @@ import AdaptativeModal from "./AdaptativeModal.js";
 import CardsModal from "./CardsModal.js";
 
 function UserActsModal({
-    user,
-    viewModal,
-    collections,
-    handleViewModal,
-    handleViewCardsModal,
-    handleViewEditCollectionModal,
-    otherUserCardsModalProps,
-    handleColDelete
+  user,
+  viewModal,
+  collections,
+  handleViewModal,
+  handleViewCardsModal,
+  handleViewEditCollectionModal,
+  otherUserCardsModalProps,
+  handleColDelete,
 }) {
   if (!viewModal) {
     return (
-      <AdaptativeModal
-        props={(handleColDelete, viewModal)}
-      ></AdaptativeModal>
+      <AdaptativeModal props={(handleColDelete, viewModal)}></AdaptativeModal>
     );
   }
 
-  const modalTitle = "User "+ user.userName + " Info";
+  const modalTitle = "User " + user.userName + " Info";
   const footer = false;
   let showCol;
 
@@ -45,23 +43,19 @@ function UserActsModal({
       };
       return <InfoDisplay key={index} {...displayProps}></InfoDisplay>;
     });
+  } else {
+    showCol = "None collection to show.";
   }
-  else{
-    showCol = "None collection to show."
-  }
-
 
   return (
     <>
-    <AdaptativeModal {...modalProps}>
-    <Row xs={2} md={3} className="justify-content-center">
-            {showCol}
-          </Row>
-    </AdaptativeModal>
-    <CardsModal {...otherUserCardsModalProps}></CardsModal>
-
+      <AdaptativeModal {...modalProps}>
+        <Row xs={2} md={3} className="justify-content-center">
+          {showCol}
+        </Row>
+      </AdaptativeModal>
+      <CardsModal {...otherUserCardsModalProps}></CardsModal>
     </>
-    
   );
 }
 

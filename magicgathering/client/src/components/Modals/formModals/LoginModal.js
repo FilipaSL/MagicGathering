@@ -4,7 +4,13 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Form } from "react-bootstrap";
 import AdaptativeModal from "../AdaptativeModal.js";
 
-function LoginModal(props) {
+function LoginModal({
+  show,
+  handleClose,
+  handleShow,
+  handleLogin,
+  loginError,
+}) {
   const email = useRef(null);
   const pass = useRef(null);
 
@@ -13,16 +19,21 @@ function LoginModal(props) {
 
   const handleLoginSubmit = (event) => {
     event.preventDefault();
-    props.handleLogin(email.current.value, pass.current.value);
+    handleLogin(email.current.value, pass.current.value);
   };
 
   const modalProps = {
     modalTitle,
+    show,
+    handleClose,
+    handleShow,
+    handleLogin,
+    loginError,
     footer,
   };
 
   return (
-    <AdaptativeModal {...props} {...modalProps}>
+    <AdaptativeModal {...modalProps}>
       <Form>
         <Form.Group className="mb-3" controlId="username">
           <Form.Label>Username</Form.Label>
@@ -37,7 +48,7 @@ function LoginModal(props) {
           <Form.Control type="password" placeholder="Password" ref={pass} />
         </Form.Group>
 
-        {props.loginError ? (
+        {loginError ? (
           <Form.Group className="mb-3" controlId="errorMessage">
             <Form.Text className="text-muted">
               Invalid Username or Password. Try again.

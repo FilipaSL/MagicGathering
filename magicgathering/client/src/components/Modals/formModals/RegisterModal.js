@@ -10,6 +10,7 @@ function RegisterModal({
   handleShow,
   handleRegister,
   registerError,
+  modalError,
 }) {
   const username = useRef(null);
   const realname = useRef(null);
@@ -34,6 +35,7 @@ function RegisterModal({
     modalTitle,
     footer,
     registerError,
+    modalError,
   };
 
   return (

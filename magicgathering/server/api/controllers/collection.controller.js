@@ -5,7 +5,7 @@ const { verifyIsAdmin, collectionFilter } = require("./helpers/helpers");
 
 //Get all collections
 const getAllCollections = async (req, res) => {
-  if (!req.user ||!verifyIsAdmin(res, req.user.admin)) {
+  if (!req.user || !verifyIsAdmin(res, req.user.admin)) {
     return;
   }
   await Collection.find()
@@ -23,8 +23,8 @@ const getAllCollections = async (req, res) => {
 
 //Get one unnoficial collection
 const getUnCollection = async (req, res) => {
-  if(!req.user ||!req.body){
-    return
+  if (!req.user || !req.body) {
+    return;
   }
   const id = req.user.id;
   const searchId = new ObjectId(id);
@@ -45,8 +45,8 @@ const getUnCollection = async (req, res) => {
 
 //All user collections
 const getAllUserCollections = async (req, res) => {
-  if(!req.user){
-    return
+  if (!req.user) {
+    return;
   }
   const id = req.user.id;
   const searchId = new ObjectId(id);
@@ -67,8 +67,8 @@ const getAllUserCollections = async (req, res) => {
 };
 
 const getAllCollectionsFromAnotherUser = async (req, res) => {
-  if(!req.user||!verifyIsAdmin(res, req.user.admin)){
-    return
+  if (!req.user || !verifyIsAdmin(res, req.user.admin)) {
+    return;
   }
   const id = req.params.id;
   const searchId = new ObjectId(id);
@@ -111,8 +111,8 @@ const postCollection = (req, res) => {
 const deleteCollection = async (req, res) => {
   const id = req.params.id;
   const searchId = new ObjectId(id);
-  if(!req.user ||!req.body){
-    return
+  if (!req.user || !req.body) {
+    return;
   }
   const filter = collectionFilter(searchId, req.user);
 
@@ -125,15 +125,15 @@ const deleteCollection = async (req, res) => {
     .catch((err) => {
       responseFormat.data = null;
       responseFormat.message = err;
-      res.status(400).json(responseFormat);
+      res.status(404).json(responseFormat);
     });
 };
 
 //Update one collection
 const updateCollection = async (req, res) => {
   const id = req.params.id;
-  if(!req.user ||!req.body){
-    return
+  if (!req.user || !req.body) {
+    return;
   }
   const body = req.body;
   const searchId = new ObjectId(id);
@@ -166,5 +166,5 @@ module.exports = {
   postCollection,
   deleteCollection,
   updateCollection,
-  getAllCollectionsFromAnotherUser
+  getAllCollectionsFromAnotherUser,
 };
