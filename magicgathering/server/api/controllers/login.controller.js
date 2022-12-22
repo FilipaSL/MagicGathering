@@ -71,8 +71,12 @@ const registerUser = async (req, res) => {
 //Create a new User
 const postUser = (req, res) => {
   if (!verifyIsAdmin(res, req.user.admin)) {
-    return;
+    responseFormat.data = null;
+    responseFormat.message = "Only an admin can perform this operation";
+
+    return res.status(400).json(responseFormat);
   }
+
   const newUser = new User(req.body);
   newUser
     .save()

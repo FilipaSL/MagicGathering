@@ -26,7 +26,9 @@ function HomePage() {
     setLoginError(null);
     setShowLogin(false);
   };
+
   const handleShowLogin = () => setShowLogin(true);
+
   const handleCloseRegister = () => {
     setRegisterError(null);
     setShowRegister(false);
@@ -71,6 +73,7 @@ function HomePage() {
         )
         .then((data) => {
           const user = data.data;
+
           if (user) {
             setRegisterAlertProps({
               handleClose: () => {
@@ -80,9 +83,9 @@ function HomePage() {
               message: "User registered! You can login!",
               variant: "success",
             });
+
             setRegisterAlert(true);
 
-            //setLoginInfo({ username: user.userName, password: user.password });
             handleCloseRegister();
           } else {
             setRegisterError(data.message);

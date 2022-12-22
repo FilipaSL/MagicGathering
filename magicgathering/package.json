@@ -799,11 +799,16 @@
     "yocto-queue": "^0.1.0"
   },
   "scripts": {
-    "start": "node server/index.js",
+    "start-client": " cd ./client && npm start ",
+    "start-server": "node server/index.js",
     "bd-start": "node server/config/db_connect",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently --kill-others \"npm run start-server\" \"npm run start-client\""
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
 }

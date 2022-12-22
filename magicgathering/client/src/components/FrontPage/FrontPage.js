@@ -443,7 +443,6 @@ function FrontPage() {
   };
 
   const handleViewEditCardModal = (id) => {
-    console.log(id);
     if (!id) {
       setCardToEditModal({
         cardName: "",
@@ -451,7 +450,9 @@ function FrontPage() {
         description: "",
       });
     }
+
     setViewEditCardModal(!viewEditCardModal);
+
     if (!viewEditCardModal) {
       const desiredCard = cards.find((card) => card._id === id);
       if (desiredCard) {
@@ -482,7 +483,7 @@ function FrontPage() {
         .updateUser(userEditModal._id, newUser)
         .then((received) => {
           if (houstonWeHaveAnAlert(received, "User Edited!")) {
-            setModalError("Incorrect values.");
+            setModalError(received.message || "Incorrect values.");
 
             //setViewEditUsersModal(false);
             return;
@@ -523,12 +524,12 @@ function FrontPage() {
     const newCard = JSON.stringify({
       collectionId: id,
     });
-
+    console.log(cardToCollectionID, newCard);
     cardRequests
       .updateCard(cardToCollectionID, newCard)
       .then((received) => {
         if (houstonWeHaveAnAlert(received, "Card Collection Changed!")) {
-          setModalError("Incorrect values.");
+          setModalError(received.message || "Incorrect values.");
 
           //setViewCollectionModal(false);
           return;
@@ -544,7 +545,7 @@ function FrontPage() {
         setFilteredOfficialCards(newCardList);
         setViewCollectionModal(false);
       })
-      .catch((error) => {
+      .catch(() => {
         setModalError("Incorrect values.");
 
         houstonWeHaveAnAlert("Error Updating Card Collection");
@@ -579,11 +580,14 @@ function FrontPage() {
       console.log("Houston we had an error");
 
       setViewAlertBar(true);
+
       const isString = typeof obj.message === "string";
+
       let msgText =
         obj.message.includes("type") || obj.message.includes("validation")
           ? "Error with input values"
           : obj.message;
+
       setAlertBarProps({
         handleClose: () => setViewAlertBar(false),
         message: isString ? msgText : "Error reading inserted values",

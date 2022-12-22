@@ -14,7 +14,7 @@
   background-color: #282c34;
 }
 
-.section-title{
+.section-title {
   color: #ffd8d8;
   margin-top: revert;
 }
@@ -28,6 +28,7 @@
 }
 
 .header {
-  width: 98vw;
-  margin: auto;
+  padding: 0 1vh 0 1vh;
+  width: auto;
+  height: 8vh;
 }

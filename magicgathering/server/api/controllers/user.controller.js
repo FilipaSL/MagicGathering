@@ -4,16 +4,24 @@ const Card = require("../models/card.model");
 const { ObjectId } = require("mongodb");
 const responseFormat = require("../utils/responseFormat");
 const { verifyIsAdmin, userPassResponseFilter } = require("./helpers/helpers");
-const {getAllCollectionsFromAnotherUser} = require("./collection.controller")
+const { getAllCollectionsFromAnotherUser } = require("./collection.controller");
 
 //Get all users
 const getAllUsers = async (req, res) => {
-  if (!req.user ||!verifyIsAdmin(res, req.user.admin)) {
-    return;
+  if (!req.user || !verifyIsAdmin(res, req.user.admin)) {
+    responseFormat.data = null;
+    responseFormat.message = req.user
+      ? "Only an admin can perform this operation"
+      : "Login to complete operation";
+
+    return res.status(400).json(responseFormat);
   }
+
   await User.find()
     .then((allUsers) => {
-      let userFilterPassword = allUsers.map((user)=> userPassResponseFilter(user)) 
+      let userFilterPassword = allUsers.map((user) =>
+        userPassResponseFilter(user)
+      );
       responseFormat.data = userFilterPassword;
       res.status(200).json(responseFormat);
     })
@@ -27,8 +35,14 @@ const getAllUsers = async (req, res) => {
 //Create a new User
 const postUser = (req, res) => {
   if (!req.user || !verifyIsAdmin(res, req.user.admin)) {
-    return;
+    responseFormat.data = null;
+    responseFormat.message = req.user
+      ? "Only an admin can perform this operation"
+      : "Login to complete operation";
+
+    return res.status(400).json(responseFormat);
   }
+
   const newUser = new User(req.body);
   newUser
     .save()
@@ -46,18 +60,23 @@ const postUser = (req, res) => {
 
 //Delete one User
 const deleteUser = async (req, res) => {
-  if (!req.user ||!verifyIsAdmin(res, req.user.admin)) {
-    return;
+  if (!req.user || !verifyIsAdmin(res, req.user.admin)) {
+    responseFormat.data = null;
+    responseFormat.message = req.user
+      ? "Only an admin can perform this operation"
+      : "Login to complete operation";
+
+    return res.status(400).json(responseFormat);
   }
+
   const id = req.params.id;
   const searchId = new ObjectId(id);
   await User.deleteOne({ _id: searchId })
     .then(async (resp) => {
-      await Collection.find({ userId: searchId })
-        .then(async (col) => {
-          await Card.deleteMany({ collectionId: col._id })
-          })
-      await Collection.deleteMany({ userId: searchId })
+      await Collection.find({ userId: searchId }).then(async (col) => {
+        await Card.deleteMany({ collectionId: col._id });
+      });
+      await Collection.deleteMany({ userId: searchId });
 
       responseFormat.data = resp;
       responseFormat.message = "Success deleting User";
@@ -68,14 +87,19 @@ const deleteUser = async (req, res) => {
       responseFormat.message = err;
       res.status(404).json(responseFormat);
     });
-  
 };
 
 //Update one User
 const updateUser = async (req, res) => {
-  if (!req.user ||!verifyIsAdmin(res, req.user.admin)) {
-    return;
+  if (!req.user || !verifyIsAdmin(res, req.user.admin)) {
+    responseFormat.data = null;
+    responseFormat.message = req.user
+      ? "Only an admin can perform this operation"
+      : "Login to complete operation";
+
+    res.status(400).json(responseFormat);
   }
+
   const id = req.params.id;
   const body = req.body;
   const searchId = new ObjectId(id);
@@ -84,8 +108,8 @@ const updateUser = async (req, res) => {
       if (!newUser) {
         responseFormat.data = null;
         responseFormat.message = "User not found";
-        res.status(400).json(responseFormat);
-        return;
+
+        return res.status(400).json(responseFormat);
       }
       responseFormat.data = userPassResponseFilter(newUser);
       responseFormat.message = "";
@@ -94,7 +118,7 @@ const updateUser = async (req, res) => {
     .catch((err) => {
       responseFormat.data = null;
       responseFormat.message = err;
-      res.status(400).json(responseFormat);
+      return res.status(400).json(responseFormat);
     });
 };
 

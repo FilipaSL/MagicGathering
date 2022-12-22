@@ -49,7 +49,7 @@ function EditUserModal({
 
   return (
     <AdaptativeModal {...modalProps}>
-      <AlertBar {...alertProps}></AlertBar>
+      {alertProps.message ? <AlertBar {...alertProps} /> : <></>}
       <Form noValidate>
         <FormEntry defValue={user.userName} label="Username" refer={username} />
         <FormEntry
