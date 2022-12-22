@@ -24,16 +24,18 @@ Initializes both frontend and backend at once.
 
 ## Setup
 
-# `open console on the project folder`
+#### `open console on the project folder`
+
+Create a `.env` file with the information that you can find on the `.env.development` file
 
 On your console type the following:
 
-# `cd magicgathering (if needed)`
+#### `cd magicgathering (if needed)`
 
-# `npm i`
+#### `npm i`
 
-# `npm start`
+#### `npm start`
 
-## Please inform me of any error that you may encounter
+#### Please inform me of any error that you may encounter
 
-## Enjoy!
+#### Enjoy!
