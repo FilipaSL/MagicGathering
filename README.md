@@ -2,6 +2,8 @@
 
 Projecto de Teste Hydradev
 
+(This is a functional version on constant improvement accordingly to my learning curve)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -22,14 +24,16 @@ Initializes both frontend and backend at once.
 
 ## Setup
 
-### `open console on the project folder`
+# `open console on the project folder`
 
 On your console type the following:
 
-### `cd magicgathering (if needed)`
+# `cd magicgathering (if needed)`
 
-### `npm i`
+# `npm i`
 
-### `npm start`
+# `npm start`
 
-Enjoy!
+## Please inform me of any error that you may encounter
+
+## Enjoy!
